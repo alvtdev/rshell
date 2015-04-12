@@ -24,17 +24,21 @@ int main (int argc, char **argv)
 		//obtain user input commands
 		std::getline(std::cin, rawinput);
 
-		
-		//TODO: Parse raw input string for commands and connectors
-
-		
 		//temporary break loop condition: user inputs 'exit' 
 		if (rawinput.substr(0,4) == "exit") 
 		{
 			killrshell = true;
 			break;
 		}
+
+		//parse through raw input and remove comments if entered
+		if (rawinput.find('#') != std::string::npos) rawinput = rawinput.substr(0, rawinput.find('#'));
+	
 		
+		//TODO: Parse raw input string for commands and connectors
+
+		
+	
 		//temporary input handling -- if exit was not entered, output the input.
 		printf("\"%s\" was entered.\n", rawinput.c_str());
 		
