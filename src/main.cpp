@@ -103,13 +103,19 @@ int main (int argc, char **argv)
 			string parsecmd;
 			for (int i=0; i<parsedinput.size(); i++)
 			{
-				if (i >= parsedinput.size()) break;
-
+				if (i >= parsedinput.size()-1) break; //accomodates for concatenated ; at the end of the string
+				//checks for & and |
 				if ( (parsedinput.at(i) == '&' || parsedinput.at(i) == '|') && parsedinput.at(i+1) == parsedinput.at(i) )
 				{
+					//if 3 &&& |||, or 1 & | -- syntax error
 					if (parsedinput.at(i+2) == parsedinput.at(i))
 					{
 						synerror =true;
+						break;
+					}
+					else if (parsedinput.at(i+1) != parsedinput.at(i))
+					{
+						synerror=true;
 						break;
 					}
 					else
@@ -121,9 +127,7 @@ int main (int argc, char **argv)
 						string constring = con1 + con2;
 						cmds.push_back(constring);
 						parsecmd.clear();
-						i+=1;
-
-						cout << "connector added" << endl;
+						i++;
 					}
 				}
 				else 
@@ -133,11 +137,10 @@ int main (int argc, char **argv)
 					{
 						cmds.push_back(parsecmd);
 						parsecmd.clear();
-
-						cout << "command added" << endl;
 					}
 				}
 			}
+			if(synerror = true) break;
 			seploopdone = true;
 		}
 
