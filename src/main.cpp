@@ -75,21 +75,40 @@ int main (int argc, char **argv)
 		//parse through raw input and remove comments if entered
 		//removes everything after '#'
 		if (rawinput.find('#') != string::npos) rawinput = rawinput.substr(0, rawinput.find('#'));
-	
-		//TODO: Parse raw input string for commands and connectors
-		char_separator<char> delim(" ", "|");
-		tokenizer< char_separator<char> > mytok(rawinput);
 
-		
-		//tokenizer test: storing tokenized objects in a string
-		string parsedinput;
-		for(auto it = mytok.begin(); it != mytok.end(); ++it)
+		//variables to keep track of whitespaces
+		int wsbegin = 0;
+		int wsend = 0;
+		string parsedinput = rawinput;
+
+
+		//first remove leading whitespaces at the very beginning of the string
+		while (parsedinput.at(wsend) == ' ') wsend++;
+		parsedinput = parsedinput.substr(wsend, parsedinput.size()-1);
+		//then reinit wsend for removing inner whitespaces
+		wsend = 0;
+
+		//next remove trailing whitespaces at the end of the string
+		wsbegin = parsedinput.size()-1;
+		if(parsedinput.at(wsbegin) == ' ')
 		{
-			parsedinput += *it;
+			while (parsedinput.at(wsbegin) == ' ')
+				--wsbegin;
+		
+			parsedinput = parsedinput.substr(0, wsbegin+1);
 		}
-		parsedinput += ";";
-		//token test output loop
-		cout << parsedinput << endl;
+		//then reinit wsbegin for removing inner whitespaces 
+		wsbegin = 0;
+
+		//remove extra whitespaces in the middle of the string
+		for (int i=0; i<parsedinput.size(); i++) 
+		{
+		}
+			
+
+
+		parsedinput += ';';
+		cout << "new input:" << parsedinput << endl;
 		
 		//initial scan for syntax errors
 		if (!isalpha(parsedinput.at(0))) synerror = true;
