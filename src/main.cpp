@@ -52,46 +52,30 @@ int main (int argc, char **argv)
 		{
 				
 			//variables to keep track of whitespaces
-			int wsbegin = 0;
-			int wsend = 0;
+			int wspos = 0;
 			string parsedinput = rawinput;
 
 
 			//first remove leading whitespaces at the very beginning of the string
-			while (parsedinput.at(wsend) == ' ') wsend++;
-			parsedinput = parsedinput.substr(wsend, parsedinput.size());
+			while (parsedinput.at(wspos) == ' ') wspos++;
+			parsedinput = parsedinput.substr(wspos, parsedinput.size());
 			//then reinit wsend for removing inner whitespaces
-			wsend = 0;
+			wspos = 0;
 
 			//next remove trailing whitespaces at the end of the string
 			parsedinput += ' '; //add space at the end to make removal easier.
-			wsbegin = parsedinput.size()-1;
-			if(parsedinput.at(wsbegin) == ' ')
+			wspos = parsedinput.size()-1;
+			if(parsedinput.at(wspos) == ' ')
 			{
-				while (parsedinput.at(wsbegin) == ' ')
+				while (parsedinput.at(wspos) == ' ')
 				{
-					--wsbegin;
+					--wspos;
 				}
 			
-				parsedinput = parsedinput.substr(0, wsbegin+1);
-			}
-			//then reinit wsbegin for removing inner whitespaces 
-			wsbegin = 0;
-
-			//remove extra whitespaces in the middle of the string
-			for (int i=0; i<parsedinput.size(); i++) 
-			{
-				if (parsedinput.at(i) == ' ' && wsbegin ==0) wsbegin = i;
-				if (parsedinput.at(i) != ' ' && wsbegin > 0) wsend = i;
-				else if (wsend > wsbegin)
-				{
-					parsedinput = parsedinput.substr(0, wsbegin) + parsedinput.substr(wsend, -1);
-					i-=(wsend-wsbegin);
-					wsbegin = 0;
-					wsend = 0;
-				}
+				parsedinput = parsedinput.substr(0, wspos+1);
 			}
 
+			//add semicolon to the end of the string to make parsing easier
 			parsedinput += ';';
 			cout << "new formatted input:" << parsedinput << endl;
 			
@@ -129,7 +113,7 @@ int main (int argc, char **argv)
 							i++;
 						}
 					}
-					else 
+					else if (parsedinput.at(i) != ' ')
 					{
 						parsecmd += parsedinput.at(i);
 						if (!isalpha(parsedinput.at(i+1)))
@@ -147,10 +131,7 @@ int main (int argc, char **argv)
 		//PARSING TEST OUTPUT
 		for (int i=0; i<cmds.size(); i++)
 			cout << cmds.at(i) << endl;
-	
-		//temporary input handling -- if exit was not entered, output the input.
-		printf("\"%s\" was entered.\n", rawinput.c_str());
-		
+
 
 	}
 
