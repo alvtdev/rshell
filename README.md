@@ -1,15 +1,12 @@
-#This is a test Readme
+#Rshell
+##The mandatory brainchild of all UCR cs-100 students.
 
-##This is a smaller line 
-###This is an even smaller line
+###What is rshell? 
+Rshell is a simple shell for unix systems.
+It is essentially an unfinished, more limited version of Bash.
 
+###Current Features
+[To be updated]
 
-This should be normal text.
-The following is c++:
-```
-#include <iostream>
-using namespace std;
-```
-
-
-i have no idea what `this` does
+###Known bugs
+[To be updated]
