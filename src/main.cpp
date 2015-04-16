@@ -127,11 +127,39 @@ int main (int argc, char **argv)
 				seploopdone = true;
 			}
 		}
+		cmds.push_back(";");
 
 		//PARSING TEST OUTPUT
 		for (int i=0; i<cmds.size(); i++)
 			cout << cmds.at(i) << endl;
 
+
+		
+		vector<string> newvec;
+		for (int i = 0; i < cmds.size(); i++)
+		{
+			//TODO: sort through vector, stop when &&, ||, or ; is found.
+			if (cmds.at(i) == "&&" || cmds.at(i) == "||" || cmds.at(i) == ";")
+			{
+				cout << "Executing... " << endl;
+				char** newargv = new char*[newvec.size()];
+				int pid = fork();
+				if (pid == -1) perror("fork");
+				if (-1 == execvp(newargv[0], newargv))
+				{
+					perror(*newargv);
+					exit(1);
+				}
+				wait(0);
+			}
+			else
+			{
+				newvec.push_back(cmds.at(i));
+				cout << "newvec: ";
+				for (int i=0; i < newvec.size(); i++)
+					cout << newvec.at(i) << endl;
+			}
+		}
 
 	}
 
