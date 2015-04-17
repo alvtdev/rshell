@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -19,7 +21,7 @@ int main (int argc, char **argv)
 	//bool value use to determine when to kill rshell loop
 	bool killrshell = false; 
 
-	while (!killrshell)
+	while (!killrshell && cin.good())
 	{
 
 		//bool will store syntax error
@@ -77,7 +79,6 @@ int main (int argc, char **argv)
 
 			//add semicolon to the end of the string to make parsing easier
 			parsedinput += ';';
-			cout << "new formatted input:" << parsedinput << endl;
 			
 			//initial scan for syntax errors
 			if (!isalpha(parsedinput.at(0))) synerror = true;
@@ -127,14 +128,8 @@ int main (int argc, char **argv)
 				seploopdone = true;
 			}
 		}
-		cmds.push_back(";");
+		cmds.push_back(string(";"));
 
-		//PARSING TEST OUTPUT
-		for (int i=0; i<cmds.size(); i++)
-			cout << cmds.at(i) << endl;
-
-
-		
 		vector<string> newvec;
 		for (int i = 0; i < cmds.size(); i++)
 		{
@@ -142,22 +137,29 @@ int main (int argc, char **argv)
 			if (cmds.at(i) == "&&" || cmds.at(i) == "||" || cmds.at(i) == ";")
 			{
 				cout << "Executing... " << endl;
+
 				char** newargv = new char*[newvec.size()];
+				for (int j = 0; j < newvec.size(); j++)
+				{
+					newargv[j] = new char[newvec.at(j).size()+1]; 
+					strcpy(newargv[j], newvec.at(j).c_str());
+				}
+
 				int pid = fork();
 				if (pid == -1) perror("fork");
-				if (-1 == execvp(newargv[0], newargv))
-				{
-					perror(*newargv);
-					exit(1);
+				if (pid == 0)
+				{	
+					if (-1 == execvp(newargv[0], newargv))
+					{
+						perror(*newargv);
+						exit(1);
+					}
 				}
 				wait(0);
 			}
 			else
 			{
 				newvec.push_back(cmds.at(i));
-				cout << "newvec: ";
-				for (int i=0; i < newvec.size(); i++)
-					cout << newvec.at(i) << endl;
 			}
 		}
 
