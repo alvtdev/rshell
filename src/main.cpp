@@ -15,7 +15,7 @@ using namespace std;
 This current algorithm was an initial attempt.
 It does not work, and will be replaced. */
 
-int main (int argc, char **argv)
+int main ()
 {
 
 	//bool value use to determine when to kill rshell loop
@@ -136,26 +136,50 @@ int main (int argc, char **argv)
 			//TODO: sort through vector, stop when &&, ||, or ; is found.
 			if (cmds.at(i) == "&&" || cmds.at(i) == "||" || cmds.at(i) == ";")
 			{
-				cout << "Executing... " << endl;
-
 				char** newargv = new char*[newvec.size()];
 				for (int j = 0; j < newvec.size(); j++)
 				{
 					newargv[j] = new char[newvec.at(j).size()+1]; 
 					strcpy(newargv[j], newvec.at(j).c_str());
+					//newargv[j].end() = NULL;
 				}
 
+				int execret = 0; //keeps track of exec return value. init to 0
 				int pid = fork();
 				if (pid == -1) perror("fork");
 				if (pid == 0)
 				{	
-					if (-1 == execvp(newargv[0], newargv))
-					{
+					execret = execvp(newargv[0], newargv);
+					if (-1 == execret)
+					{	
+						for (int i=0; i < newvec.size(); i++)
+						{
+							delete[] newargv[i];
+						}
 						perror(*newargv);
+						delete[] newargv;
 						exit(1);
 					}
 				}
+				//conditions for && and ||
+				if (cmds.at(i) == "&&" && execret == 0)
+				{
+					newvec.clear();
+				}
+				else if (cmds.at(i) == "||" && execret == 0)
+				{
+					break;
+				}
+				
+				for (int i=0; i < newvec.size(); i++)
+				{
+						delete[] newargv[i];
+				}
+				delete[] newargv;
+
+
 				wait(0);
+				newvec.clear();
 			}
 			else
 			{
