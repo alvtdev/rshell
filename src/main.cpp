@@ -37,6 +37,12 @@ int main (int argc, char** argv)
 		//obtain user input commands
 		getline(cin, rawinput);
 
+		if (!cin.good())
+		{
+			printf("\n");
+			break;
+		}
+
 		//temporary break loop condition: user inputs 'exit' 
 		if (rawinput.substr(0,4) == "exit") 
 		{
@@ -77,8 +83,8 @@ int main (int argc, char** argv)
 				parsedinput = parsedinput.substr(0, wspos+1);
 			}
 
-			//add semicolon to the end of the string to make parsing easier
-			parsedinput += ';';
+			//add semicolon to the end of the string to make parsing easier -- only if there isn't already a semicolon there in the first place
+			if (parsedinput.at(parsedinput.size()-1) != ';') parsedinput += ';';
 			
 			//initial scan for syntax errors
 			if (!isalpha(parsedinput.at(0))) synerror = true;
@@ -86,13 +92,27 @@ int main (int argc, char** argv)
 			//bool variable to tell when the inner for loop is done
 			bool seploopdone = false;
 
+
 			//iterate through string and separate into commands and connectors
-			while (synerror != true && seploopdone == false)
+			while (synerror == false && seploopdone == false)
 			{
 				string parsecmd;
+				
+				if (parsedinput.at(0) == ';') 
+				{
+					synerror = true;
+					break;
+				}
+
 				for (unsigned i=0; i<parsedinput.size(); i++)
 				{
 					if (i >= parsedinput.size()-1) break; //accomodates for concatenated ; at the end of the string
+					//if 2+ ;; -- syntax error
+					if (parsedinput.at(i) == ';' && parsedinput.at(i+1) == parsedinput.at(i))
+					{
+						synerror = true;
+						break;
+					}
 					//checks for & and |
 					if ( (parsedinput.at(i) == '&' || parsedinput.at(i) == '|') && parsedinput.at(i+1) == parsedinput.at(i) )
 					{
@@ -100,12 +120,6 @@ int main (int argc, char** argv)
 						if (parsedinput.at(i+2) == parsedinput.at(i))
 						{
 							synerror =true;
-							break;
-						}
-						//if 2+ ;; -- syntax error
-						if (parsedinput.at(i) == ';' && (parsedinput.at(i+1) == parsedinput.at(i)))
-						{
-							synerror = true;
 							break;
 						}
 						
@@ -136,16 +150,30 @@ int main (int argc, char** argv)
 			}
 		}
 
+		if (cmds.at(cmds.size()-1) == "&&" || cmds.at(cmds.size()-1) == "||") synerror = true;
+
+
+		//EXECUTE THE FOLLOWING IF SYNTAX ERRORS WERE NOT FOUND
+
 		if (synerror != true)
 		{
-				
 			cmds.push_back(string(";"));
 
 			vector<string> newvec;
 			for (unsigned i = 0; i < cmds.size(); i++)
+			{
 			
 				if (cmds.at(i) == "&&" || cmds.at(i) == "||" || cmds.at(i) == ";")
 				{
+
+					//if "&& ; " or "|| ;" was entered -- syntax error
+					if ((cmds.at(i) == "&&" || cmds.at(i) == "||") && cmds.at(i+1) == ";")
+					{
+						synerror = true;
+						break;
+					}
+
+					//else, proceed to convert to char** and call execvp
 					char** newargv = new char*[newvec.size()+1];
 					for (unsigned j = 0; j < newvec.size(); j++)
 					{
@@ -189,7 +217,8 @@ int main (int argc, char** argv)
 						}
 						delete[] newargv;
 					}
-					if (cmds.at(i) == "||" && execret == 0) break; 
+					if (cmds.at(i) == "&&" && cmds.at(i-1) == "false") break;
+					if (cmds.at(i) == "||" && execret == 0 && cmds.at(i-1) != "false") break; 
 					if (cmds.at(i) == ";" && i == cmds.size()-1) break;
 				}
 				else if (cmds.at(i) == "exit" && (cmds.at(i-1) == ";" || cmds.at(i-1) == "&&"))
@@ -202,11 +231,14 @@ int main (int argc, char** argv)
 					newvec.push_back(cmds.at(i));
 				}
 			}
-			if (synerror == true)
-			{
-				printf("Syntax error.\n");
-			}
 		}
+		if (synerror == true)
+		{
+			printf("Syntax error.\n");
+		}
+	}
+
+	printf("\nGoodbye.\n");
 	
 	return 0;
-} 
+}
