@@ -90,7 +90,7 @@ int main ()
 			while (synerror != true && seploopdone == false)
 			{
 				string parsecmd;
-				for (int i=0; i<parsedinput.size(); i++)
+				for (unsigned i=0; i<parsedinput.size(); i++)
 				{
 					if (i >= parsedinput.size()-1) break; //accomodates for concatenated ; at the end of the string
 					//checks for & and |
@@ -124,62 +124,65 @@ int main ()
 						}
 					}
 				}
-				if(synerror = true) break;
+				if(synerror == true) break;
 				seploopdone = true;
 			}
 		}
 		cmds.push_back(string(";"));
 
 		vector<string> newvec;
-		for (int i = 0; i < cmds.size(); i++)
+		for (unsigned i = 0; i < cmds.size(); i++)
 		{
 			//TODO: sort through vector, stop when &&, ||, or ; is found.
 			if (cmds.at(i) == "&&" || cmds.at(i) == "||" || cmds.at(i) == ";")
 			{
-				char** newargv = new char*[newvec.size()];
-				for (int j = 0; j < newvec.size(); j++)
+				char** newargv = new char*[newvec.size()+1];
+				for (unsigned j = 0; j < newvec.size(); j++)
 				{
 					newargv[j] = new char[newvec.at(j).size()+1]; 
 					strcpy(newargv[j], newvec.at(j).c_str());
-					//newargv[j].end() = NULL;
 				}
+				newargv[newvec.size()] = '\0';
 
 				int execret = 0; //keeps track of exec return value. init to 0
-				int pid = fork();
-				if (pid == -1) perror("fork");
+				int pid = fork(); if (pid == -1) perror("fork");
+				//if we're in the child
 				if (pid == 0)
 				{	
 					execret = execvp(newargv[0], newargv);
 					if (-1 == execret)
 					{	
-						for (int i=0; i < newvec.size(); i++)
+						perror(*newargv);
+						for (unsigned k=0; k < newvec.size(); k++)
 						{
 							delete[] newargv[i];
 						}
-						perror(*newargv);
 						delete[] newargv;
 						exit(1);
 					}
+				
+					//conditions for && and ||
+					if (cmds.at(i) == "||" && execret == 0) cmds.clear();
+					if (cmds.at(i) == ";" && i == cmds.size()-1) cmds.clear();
 				}
-				//conditions for && and ||
-				if (cmds.at(i) == "&&" && execret == 0)
+
+				else 
+				{
+					if (-1 == wait(0)) 
+					{
+						perror("wait");
+						exit(1);
+					}
+				}
+				if (newvec.size() > 0)
 				{
 					newvec.clear();
+					for (unsigned k=0; k < newvec.size(); k++)
+					{
+							delete[] newargv[i];
+					}
+					delete[] newargv;
 				}
-				else if (cmds.at(i) == "||" && execret == 0)
-				{
-					break;
-				}
-				
-				for (int i=0; i < newvec.size(); i++)
-				{
-						delete[] newargv[i];
-				}
-				delete[] newargv;
-
-
-				wait(0);
-				newvec.clear();
 			}
 			else
 			{
