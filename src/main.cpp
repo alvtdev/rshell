@@ -15,7 +15,7 @@ using namespace std;
 This current algorithm was an initial attempt.
 It does not work, and will be replaced. */
 
-int main ()
+int main (int argc, char** argv)
 {
 
 	//bool value use to determine when to kill rshell loop
@@ -102,6 +102,13 @@ int main ()
 							synerror =true;
 							break;
 						}
+						//if 2+ ;; -- syntax error
+						if (parsedinput.at(i) == ';' && (parsedinput.at(i+1) == parsedinput.at(i)))
+						{
+							synerror = true;
+							break;
+						}
+						
 						else
 						{
 							string con1;
@@ -128,69 +135,78 @@ int main ()
 				seploopdone = true;
 			}
 		}
-		cmds.push_back(string(";"));
 
-		vector<string> newvec;
-		for (unsigned i = 0; i < cmds.size(); i++)
+		if (synerror != true)
 		{
-			//TODO: sort through vector, stop when &&, ||, or ; is found.
-			if (cmds.at(i) == "&&" || cmds.at(i) == "||" || cmds.at(i) == ";")
-			{
-				char** newargv = new char*[newvec.size()+1];
-				for (unsigned j = 0; j < newvec.size(); j++)
-				{
-					newargv[j] = new char[newvec.at(j).size()+1]; 
-					strcpy(newargv[j], newvec.at(j).c_str());
-				}
-				newargv[newvec.size()] = '\0';
+				
+			cmds.push_back(string(";"));
 
-				int execret = 0; //keeps track of exec return value. init to 0
-				int pid = fork(); if (pid == -1) perror("fork");
-				//if we're in the child
-				if (pid == 0)
-				{	
-					execret = execvp(newargv[0], newargv);
-					if (-1 == execret)
+			vector<string> newvec;
+			for (unsigned i = 0; i < cmds.size(); i++)
+			
+				if (cmds.at(i) == "&&" || cmds.at(i) == "||" || cmds.at(i) == ";")
+				{
+					char** newargv = new char*[newvec.size()+1];
+					for (unsigned j = 0; j < newvec.size(); j++)
+					{
+						newargv[j] = new char[newvec.at(j).size()+1]; 
+						strcpy(newargv[j], newvec.at(j).c_str());
+					}
+					newargv[newvec.size()] = '\0';
+
+					int execret = 0; //keeps track of exec return value. init to 0
+					int pid = fork();
+					if (pid == -1) perror("fork");
+					//if we're in the child
+					if (pid == 0)
 					{	
-						perror(*newargv);
+						execret = execvp(newargv[0], newargv);
+						if (-1 == execret)
+						{	
+							perror(*newargv);
+							for (unsigned k=0; k < newvec.size(); k++)
+							{
+								delete[] newargv[i];
+							}
+							delete[] newargv;
+							exit(1);
+						}
+					}
+					else 
+					{
+						if (-1 == wait(0)) 
+						{
+							perror("wait");
+							exit(1);
+						}
+					}
+					if (newvec.size() > 0)
+					{
+						newvec.clear();
 						for (unsigned k=0; k < newvec.size(); k++)
 						{
-							delete[] newargv[i];
+								delete[] newargv[i];
 						}
 						delete[] newargv;
-						exit(1);
 					}
-				
-					//conditions for && and ||
-					if (cmds.at(i) == "||" && execret == 0) cmds.clear();
-					if (cmds.at(i) == ";" && i == cmds.size()-1) cmds.clear();
+					if (cmds.at(i) == "||" && execret == 0) break; 
+					if (cmds.at(i) == ";" && i == cmds.size()-1) break;
 				}
-
-				else 
+				else if (cmds.at(i) == "exit" && (cmds.at(i-1) == ";" || cmds.at(i-1) == "&&"))
 				{
-					if (-1 == wait(0)) 
-					{
-						perror("wait");
-						exit(1);
-					}
+					killrshell = true;
+					break;
 				}
-				if (newvec.size() > 0)
+				else
 				{
-					newvec.clear();
-					for (unsigned k=0; k < newvec.size(); k++)
-					{
-							delete[] newargv[i];
-					}
-					delete[] newargv;
+					newvec.push_back(cmds.at(i));
 				}
 			}
-			else
+			if (synerror == true)
 			{
-				newvec.push_back(cmds.at(i));
+				printf("Syntax error.\n");
 			}
 		}
-
-	}
-
+	
 	return 0;
 } 
