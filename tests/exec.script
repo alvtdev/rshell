@@ -1,0 +1,164 @@
+Script started on Sun 19 Apr 2015 08:03:18 PM PDT
+~/rshell
+athai005@hammer $ bin/rshell
+athai005@hammer.cs.ucr.edu $ ls
+bin  LICENSE  Makefile	README.md  README.md~  src  tests
+athai005@hammer.cs.ucr.edu $ ls - a  a
+.  ..  bin  .git  LICENSE  Makefile  README.md	README.md~  src  tests
+athai005@hammer.cs.ucr.edu $ ls -a -l -r
+total 44
+drwx------  2 athai005 csmajs 4096 Apr 19 19:57 tests
+drwx------  2 athai005 csmajs 4096 Apr 19 19:01 src
+-rw-------  1 athai005 csmajs  801 Apr 19 18:35 README.md~
+-rw-------  1 athai005 csmajs  818 Apr 19 18:36 README.md
+-rw-------  1 athai005 csmajs  141 Apr 18 16:16 Makefile
+-rw-------  1 athai005 csmajs 1076 Apr 18 16:10 LICENSE
+drwx------  8 athai005 csmajs 4096 Apr 19 19:06 .git
+drwx------  2 athai005 csmajs 4096 Apr 19 19:44 bin
+drwx------ 35 athai005 csmajs 8192 Apr 19 19:44 ..
+drwx------  6 athai005 csmajs 4096 Apr 19 19:16 .
+athai005@hammer.cs.ucr.edu $            ls            -a                 l -l
+total 44
+drwx------  6 athai005 csmajs 4096 Apr 19 19:16 .
+drwx------ 35 athai005 csmajs 8192 Apr 19 19:44 ..
+drwx------  2 athai005 csmajs 4096 Apr 19 19:44 bin
+drwx------  8 athai005 csmajs 4096 Apr 19 19:06 .git
+-rw-------  1 athai005 csmajs 1076 Apr 18 16:10 LICENSE
+-rw-------  1 athai005 csmajs  141 Apr 18 16:16 Makefile
+-rw-------  1 athai005 csmajs  818 Apr 19 18:36 README.md
+-rw-------  1 athai005 csmajs  801 Apr 19 18:35 README.md~
+drwx------  2 athai005 csmajs 4096 Apr 19 19:01 src
+drwx------  2 athai005 csmajs 4096 Apr 19 19:57 tests
+athai005@hammer.cs.ucr.edu $                                  ls ;                     
+bin  LICENSE  Makefile	README.md  README.md~  src  tests
+athai005@hammer.cs.ucr.edu $ cmdkalmaewf
+cmdkalmaewf: No such file or directory
+athai005@hammer.cs.ucr.edu $ mlakmalaldarj;
+mlakmalaldarj: No such file or directory
+athai005@hammer.cs.ucr.edu $ false && ls
+athai005@hammer.cs.ucr.edu $ false || ls
+bin  LICENSE  Makefile	README.md  README.md~  src  tests
+athai005@hammer.cs.ucr.edu $ true && ls
+bin  LICENSE  Makefile	README.md  README.md~  src  tests
+athai005@hammer.cs.ucr.edu $ true || ls
+athai005@hammer.cs.ucr.edu $ #this is a comment
+athai005@hammer.cs.ucr.edu $ ls -l #comment
+total 28
+drwx------ 2 athai005 csmajs 4096 Apr 19 19:44 bin
+-rw------- 1 athai005 csmajs 1076 Apr 18 16:10 LICENSE
+-rw------- 1 athai005 csmajs  141 Apr 18 16:16 Makefile
+-rw------- 1 athai005 csmajs  818 Apr 19 18:36 README.md
+-rw------- 1 athai005 csmajs  801 Apr 19 18:35 README.md~
+drwx------ 2 athai005 csmajs 4096 Apr 19 19:01 src
+drwx------ 2 athai005 csmajs 4096 Apr 19 19:57 tests
+athai005@hammer.cs.ucr.edu $ ls -a# the hash is touching the a D: oh noes
+.  ..  bin  .git  LICENSE  Makefile  README.md	README.md~  src  tests
+athai005@hammer.cs.ucr.edu $ ls -a -l exit #this should not exit
+ls: cannot access exit: No such file or directory
+athai005@hammer.cs.ucr.edu $ ls && mkdir testfolder && ls && rm-rf    -rf && ls  
+bin  LICENSE  Makefile	README.md  README.md~  src  tests
+bin  LICENSE  Makefile	README.md  README.md~  src  testfolder	tests
+bin  LICENSE  Makefile	README.md  README.md~  src  testfolder	tests
+athai005@hammer.cs.ucr.edu $ rm -rf testfolder
+athai005@hammer.cs.ucr.edu $ ls&&mkdir testfolder&&ls&&rm -rf testfolder&&ls
+bin  LICENSE  Makefile	README.md  README.md~  src  tests
+bin  LICENSE  Makefile	README.md  README.md~  src  testfolder	tests
+bin  LICENSE  Makefile	README.md  README.md~  src  tests
+athai005@hammer.cs.ucr.edu $ false||trye  ue&&exit
+
+Goodbye.
+~/rshell
+athai005@hammer $ bin/rshell
+athai005@hammer.cs.ucr.edu $ exit
+
+Goodbye.
+~/rshell
+athai005@hammer $ bin/rshell
+athai005@hammer.cs.ucr.edu $ ls -l && echo pass
+total 28
+drwx------ 2 athai005 csmajs 4096 Apr 19 19:44 bin
+-rw------- 1 athai005 csmajs 1076 Apr 18 16:10 LICENSE
+-rw------- 1 athai005 csmajs  141 Apr 18 16:16 Makefile
+-rw------- 1 athai005 csmajs  818 Apr 19 18:36 README.md
+-rw------- 1 athai005 csmajs  801 Apr 19 18:35 README.md~
+drwx------ 2 athai005 csmajs 4096 Apr 19 19:01 src
+drwx------ 2 athai005 csmajs 4096 Apr 19 19:57 tests
+pass
+athai005@hammer.cs.ucr.edu $ false || echo fail && echo true
+fail
+true
+athai005@hammer.cs.ucr.edu $ false||echo fail&&ecoh  ho true
+fail
+true
+athai005@hammer.cs.ucr.edu $ ls -l; exit
+total 28
+drwx------ 2 athai005 csmajs 4096 Apr 19 19:44 bin
+-rw------- 1 athai005 csmajs 1076 Apr 18 16:10 LICENSE
+-rw------- 1 athai005 csmajs  141 Apr 18 16:16 Makefile
+-rw------- 1 athai005 csmajs  818 Apr 19 18:36 README.md
+-rw------- 1 athai005 csmajs  801 Apr 19 18:35 README.md~
+drwx------ 2 athai005 csmajs 4096 Apr 19 19:01 src
+drwx------ 2 athai005 csmajs 4096 Apr 19 19:57 tests
+
+Goodbye.
+~/rshell
+athai005@hammer $ bin/rshell
+athai005@hammer.cs.ucr.edu $ ls;ls;ls;ls;ls;ls;ls
+ls: cannot access ;ls: No such file or directory
+ls: cannot access ;ls: No such file or directory
+ls: cannot access ;ls: No such file or directory
+ls: cannot access ;ls: No such file or directory
+ls: cannot access ;ls: No such file or directory
+ls: cannot access ;ls: No such file or directory
+athai005@hammer.cs.ucr.edu $ ls -a; ls -a || exit
+.  ..  bin  .git  LICENSE  Makefile  README.md	README.md~  src  tests
+.  ..  bin  .git  LICENSE  Makefile  README.md	README.md~  src  tests
+athai005@hammer.cs.ucr.edu $ ls -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a
+.  ..  bin  .git  LICENSE  Makefile  README.md	README.md~  src  tests
+athai005@hammer.cs.ucr.edu $ km  mkdir testfolder#with comments
+athai005@hammer.cs.ucr.edu $ ls -l# more comment verification
+total 32
+drwx------ 2 athai005 csmajs 4096 Apr 19 19:44 bin
+-rw------- 1 athai005 csmajs 1076 Apr 18 16:10 LICENSE
+-rw------- 1 athai005 csmajs  141 Apr 18 16:16 Makefile
+-rw------- 1 athai005 csmajs  818 Apr 19 18:36 README.md
+-rw------- 1 athai005 csmajs  801 Apr 19 18:35 README.md~
+drwx------ 2 athai005 csmajs 4096 Apr 19 19:01 src
+drwx------ 2 athai005 csmajs 4096 Apr 19 20:03 testfolder
+drwx------ 2 athai005 csmajs 4096 Apr 19 19:57 tests
+athai005@hammer.cs.ucr.edu $ false && rm -rf teste folder
+athai005@hammer.cs.ucr.edu $ ls
+bin  LICENSE  Makefile	README.md  README.md~  src  testfolder	tests
+athai005@hammer.cs.ucr.edu $ tru   false || rm-  -rf testfolder
+athai005@hammer.cs.ucr.edu $ exit -l -a -r #this will exit rea    
+
+Goodbye.
+~/rshell
+athai005@hammer $ bin/rshell
+athai005@hammer.cs.ucr.edu $ #the following commands will not execute; mkdir testfolder && ls && rm-r   -rf testfolder
+athai005@hammer.cs.ucr.edu $ ls
+bin  LICENSE  Makefile	README.md  README.md~  src  tests
+athai005@hammer.cs.ucr.edu $ bin/rshell
+bin: Permission denied
+athai005@hammer.cs.ucr.edu $ #not sure if "permission denied" is a bug or not. oh well.  
+athai005@hammer.cs.ucr.edu $ pwd
+/home/csmajs/athai005/rshell
+athai005@hammer.cs.ucr.edu $             pwd ; ls     && pwd
+/home/csmajs/athai005/rshell
+bin  LICENSE  Makefile	README.md  README.md~  src  tests
+/home/csmajs/athai005/rshell
+athai005@hammer.cs.ucr.edu $  asdf
+asdf: No such file or directory
+athai005@hammer.cs.ucr.edu $                                        asdf
+asdf: No such file or directory
+athai005@hammer.cs.ucr.edu $      ls                                                 &&                                   mkdir testfolder                               || ls
+bin  LICENSE  Makefile	README.md  README.md~  src  tests
+athai005@hammer.cs.ucr.edu $ false ||      ls      && rm-rf    -rf   testfolder                          &&                  ls ; exit
+bin  LICENSE  Makefile	README.md  README.md~  src  testfolder	tests
+bin  LICENSE  Makefile	README.md  README.md~  src  tests
+
+Goodbye.
+~/rshell
+athai005@hammer $ exit
+
+Script done on Sun 19 Apr 2015 08:13:41 PM PDT
