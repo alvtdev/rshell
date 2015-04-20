@@ -13,8 +13,10 @@ It is essentially an unfinished, more limited version of Bash.
 * prints a "Goodbye" message when terminated.
 * A syntax error message will be printed when one is detected.
 
-###Known bugs that need to be fixed.
-* Any command entered that begins with a semicolon causes an error.
-* Some memory leaks occur. (but will be fixed).
+###Known bugs
+(that need to, and will, be fixed)
+* Any command entered that begins with a semicolon or forward slash causes an error. (e.g. ;ls)
+* Unable to run rshell within rshell; (bin/rshell gives a permission denied message)
+* Some memory leaks occur. 
 
 
