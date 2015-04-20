@@ -11,12 +11,13 @@ It is essentially an unfinished, more limited version of Bash.
 * handles "exit".
 * can also be terminated using ctrl+d.
 * prints a "Goodbye" message when terminated.
-* A syntax error message will be printed when one is detected.
+* A syntax error message will be printed when one is detected. (e.g. ls &&&&&&& ; ||||)
 
 ###Known bugs
 (that need to, and will, be fixed)
 * Any command entered that begins with a semicolon or forward slash causes an error. (e.g. ;ls)
 * Unable to run rshell within rshell; (bin/rshell gives a permission denied message)
 * Some memory leaks occur. 
+* bin/rshell returns a "permission denied" message (not entirely sure if this is a bug with rshell)
 
 
