@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <dirent.h>
 #include <sys/types.h>
+#include <errno.h>
 
 //custom ls header file
 #include "ls.h"
@@ -21,10 +22,6 @@ int main(int argc, char** argv)
 
 	//keeps track of all arguments passed after ls
 	vector<char*> lsargs;
-
-	//char* that store ".". use if lsargs is empty
-	char dot = '.';
-	char* pdot = &dot;
 
 	//sort through args for flags or directories
 	for (unsigned i=1; i < argc; i++)
@@ -47,18 +44,19 @@ int main(int argc, char** argv)
 	}
 
 	//parsing and flag test output
-	#define FLAGTEST(x) cout << #x " = " << (x==true)?"true":"false"; cout << endl;
+	/* #define FLAGTEST(x) cout << #x " = " << (x==true)?"true":"false"; cout << endl;
 	#define PARSETEST(x) for(unsigned i=0; i < x.size() ; i++) { cout << x.at(i) << endl; }
 
 	FLAGTEST(aflag);
 	FLAGTEST(lflag);
 	FLAGTEST(Rflag);
-	PARSETEST(lsargs); 
-	cout << "lsargs.size = " << lsargs.size() << endl;
-
+	PARSETEST(lsargs); */
+	
+	//push back "." if arguments are not present.
+	//accounts for an "ls [flag]" call without a directory passed in.
 	if(lsargs.empty())
 	{
-		lsargs.push_back(pdot);
+		lsargs.push_back((char*)".");
 	}
 
 	//vector that stores all filenames in directory
@@ -70,7 +68,7 @@ int main(int argc, char** argv)
 		DIR* dirptr = opendir(lsargs[i]);
 		if (dirptr == NULL)
 		{
-			perror("opendir");
+			perror("opendir failed");
 			exit(1);
 		}
 		//get directory entry pointers and store file names
@@ -79,7 +77,7 @@ int main(int argc, char** argv)
 		{
 			if (errno !=0) 
 			{
-				perror("readdir");
+				perror("readdir failed");
 				exit(1);
 			}
 			if (de->d_name[0] != '.') 
@@ -95,12 +93,19 @@ int main(int argc, char** argv)
 
 	sort(filenames.begin(), filenames.end(), compcstrings);
 
-	//TEST: output filenames
-	for (unsigned i=0; i < filenames.size(); i++) 
+	//print branches and conditions
+
+	if (Rflag == true)
 	{
-		cout << filenames.at(i) << endl;
 	}
-		
+	else if (lflag == true)
+	{
+		printlist(filenames);
+	}
+	else
+	{
+		printnorm(filenames);
+	}
 
 	return 0;
 }
