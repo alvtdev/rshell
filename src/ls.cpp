@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
+#include <algorithm>
+#include <dirent.h>
+#include <sys/types.h>
+
+//custom ls header file
+#include "ls.h"
 
 using namespace std;
 
@@ -15,6 +21,10 @@ int main(int argc, char** argv)
 
 	//keeps track of all arguments passed after ls
 	vector<char*> lsargs;
+
+	//char* that store ".". use if lsargs is empty
+	char dot = '.';
+	char* pdot = &dot;
 
 	//sort through args for flags or directories
 	for (unsigned i=1; i < argc; i++)
@@ -43,9 +53,54 @@ int main(int argc, char** argv)
 	FLAGTEST(aflag);
 	FLAGTEST(lflag);
 	FLAGTEST(Rflag);
+	PARSETEST(lsargs); 
+	cout << "lsargs.size = " << lsargs.size() << endl;
 
-	PARSETEST(lsargs);
+	if(lsargs.empty())
+	{
+		lsargs.push_back(pdot);
+	}
 
+	//vector that stores all filenames in directory
+	vector<char*> filenames;
+
+	//get directory pointer 
+	for (unsigned i=0; i < lsargs.size(); i++)
+	{
+		DIR* dirptr = opendir(lsargs[i]);
+		if (dirptr == NULL)
+		{
+			perror("opendir");
+			exit(1);
+		}
+		//get directory entry pointers and store file names
+		struct dirent* de;
+		while (de = readdir(dirptr))
+		{
+			if (errno !=0) 
+			{
+				perror("readdir");
+				exit(1);
+			}
+			if (de->d_name[0] != '.') 
+			{
+				filenames.push_back(de->d_name);
+			}
+			if (de->d_name[0] == '.' && aflag)
+			{
+				filenames.push_back(de->d_name);
+			}
+		}
+	}
+
+	sort(filenames.begin(), filenames.end(), compcstrings);
+
+	//TEST: output filenames
+	for (unsigned i=0; i < filenames.size(); i++) 
+	{
+		cout << filenames.at(i) << endl;
+	}
+		
 
 	return 0;
 }
