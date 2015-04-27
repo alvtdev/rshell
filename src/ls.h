@@ -58,6 +58,7 @@ void printnorm(vector<char*> x)
 void printlist(const vector<char*> x)
 {
 
+	//initial stat call to obtain first size output format int
 	struct stat temp;
 	stat(x.at(0), &temp);
 	if (errno != 0)
@@ -70,15 +71,15 @@ void printlist(const vector<char*> x)
 	int sizeform = log10(temp.st_size)+1;
 
 	//now iterate through the rest of the files to find largest size
-	for (unsigned i=1; i<x.size(); i++);
+	for (unsigned j=1; j<x.size(); j++)
 	{
-		stat(x.at(0), &temp);
+		stat(x.at(j), &temp);
 		if (errno != 0)
 		{
 			perror("formatting stat failed");
 			exit(1);
 		}
-		if (log10(temp.st_size)+1 >= sizeform) 
+		if ((log10(temp.st_size)+1) > sizeform) 
 		{
 			sizeform = log10(temp.st_size)+1;
 		}

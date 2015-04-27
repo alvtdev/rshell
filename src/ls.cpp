@@ -95,9 +95,12 @@ int main(int argc, char** argv)
 		
 	sort(filenames.begin(), filenames.end(), compcstrings);
 
+//test output for checking contents of filenames vector
+/*
 	for (unsigned i=0; i < filenames.size(); i++)
 		cout << filenames.at(i) << ' ';
 	cout << endl;
+*/
 
 	//print branches and conditions
 
