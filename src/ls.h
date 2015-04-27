@@ -61,7 +61,7 @@ void printlist(vector<char*> x)
 	stat(x.at(0), &temp);
 	if (errno != 0)
 	{
-		perror("stat failed");
+		perror("initial stat failed");
 		exit(1);
 	}
 	
@@ -74,7 +74,7 @@ void printlist(vector<char*> x)
 		stat(x.at(0), &temp);
 		if (errno != 0)
 		{
-			perror("stat failed");
+			perror("formatting stat failed");
 			exit(1);
 		}
 		if (log10(temp.st_size)+1 >= sizeform) 
@@ -87,6 +87,7 @@ void printlist(vector<char*> x)
 	for (unsigned i=0; i< x.size(); i++)
 	{
 		//obtain info of file at x.at(i)
+		cout << "stat being called on: " << x.at(i) << endl;
 		struct stat s;
 		stat(x.at(i), &s);
 		if (errno != 0)

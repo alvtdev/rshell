@@ -63,15 +63,15 @@ int main(int argc, char** argv)
 	vector<char*> filenames;
 
 	//get directory pointer 
+	DIR* dirptr; 
 	for (unsigned i=0; i < lsargs.size(); i++)
 	{
-		DIR* dirptr = opendir(lsargs[i]);
+		dirptr = opendir(lsargs[i]);
 		if (dirptr == NULL)
 		{
 			perror("opendir failed");
 			exit(1);
 		}
-		closedir(dirptr);
 		//get directory entry pointers and store file names
 		struct dirent* de;
 		while (de = readdir(dirptr))
@@ -91,7 +91,13 @@ int main(int argc, char** argv)
 			}
 		}
 	}
-
+	closedir(dirptr);
+	if (errno != 0)
+	{
+		perror("closedir failed");
+		exit(1);
+	}
+		
 	sort(filenames.begin(), filenames.end(), compcstrings);
 
 	//print branches and conditions
