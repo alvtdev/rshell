@@ -55,8 +55,9 @@ void printnorm(vector<char*> x)
 	return;
 }
 
-void printlist(vector<char*> x)
+void printlist(const vector<char*> x)
 {
+
 	struct stat temp;
 	stat(x.at(0), &temp);
 	if (errno != 0)
@@ -87,7 +88,7 @@ void printlist(vector<char*> x)
 	for (unsigned i=0; i< x.size(); i++)
 	{
 		//obtain info of file at x.at(i)
-		cout << "stat being called on: " << x.at(i) << endl;
+//		cout << "stat being called on: " << x.at(i) << endl;
 		struct stat s;
 		stat(x.at(i), &s);
 		if (errno != 0)
@@ -141,6 +142,7 @@ void printlist(vector<char*> x)
 
 		//print size
 		printf("%*li ", sizeform, s.st_size);
+//		printf("%li ", s.st_size);
 	
 		//obtain and print time last modified 
 		struct tm lastmodtime;

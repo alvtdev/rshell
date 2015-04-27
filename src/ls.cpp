@@ -90,15 +90,14 @@ int main(int argc, char** argv)
 				filenames.push_back(de->d_name);
 			}
 		}
-	}
-	closedir(dirptr);
-	if (errno != 0)
-	{
-		perror("closedir failed");
-		exit(1);
+		delete[] de;
 	}
 		
 	sort(filenames.begin(), filenames.end(), compcstrings);
+
+	for (unsigned i=0; i < filenames.size(); i++)
+		cout << filenames.at(i) << ' ';
+	cout << endl;
 
 	//print branches and conditions
 
@@ -114,5 +113,10 @@ int main(int argc, char** argv)
 		printnorm(filenames);
 	}
 
+	if (-1 == closedir(dirptr))
+	{
+		perror("closedir failed");
+		exit(1);
+	}
 	return 0;
 }
