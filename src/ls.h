@@ -10,6 +10,7 @@
 #include <pwd.h>
 #include <errno.h>
 #include <time.h>
+#include <math.h>
 using namespace std; 
 
 //function for comparing cstrings
@@ -44,6 +45,8 @@ bool compcstrings(const char* cs1, const char* cs2)
 
 void printnorm(vector<char*> x)
 {
+	//assume terminal width is 72 or 80, 
+	//TODO: format print accordingly.
 	for (unsigned i = 0; i < x.size(); i++)
 	{
 		printf("%s  ", x.at(i));
@@ -54,6 +57,33 @@ void printnorm(vector<char*> x)
 
 void printlist(vector<char*> x)
 {
+	struct stat temp;
+	stat(x.at(0), &temp);
+	if (errno != 0)
+	{
+		perror("stat failed");
+		exit(1);
+	}
+	
+	//integer used to format printf for size output
+	int sizeform = log10(temp.st_size)+1;
+
+	//now iterate through the rest of the files to find largest size
+	for (unsigned i=1; i<x.size(); i++);
+	{
+		stat(x.at(0), &temp);
+		if (errno != 0)
+		{
+			perror("stat failed");
+			exit(1);
+		}
+		if (log10(temp.st_size)+1 >= sizeform) 
+		{
+			sizeform = log10(temp.st_size)+1;
+		}
+	}
+
+	//iterate through and print out all info
 	for (unsigned i=0; i< x.size(); i++)
 	{
 		//obtain info of file at x.at(i)
@@ -109,7 +139,7 @@ void printlist(vector<char*> x)
 		printf("%s ", groupinfo->pw_name);
 
 		//print size
-		printf("%li ", s.st_size);
+		printf("%*li ", sizeform, s.st_size);
 	
 		//obtain and print time last modified 
 		struct tm lastmodtime;

@@ -71,6 +71,7 @@ int main(int argc, char** argv)
 			perror("opendir failed");
 			exit(1);
 		}
+		closedir(dirptr);
 		//get directory entry pointers and store file names
 		struct dirent* de;
 		while (de = readdir(dirptr))
