@@ -84,10 +84,9 @@ void printlist(vector<char*> x)
 			<< ((S_IROTH & s.st_mode)?"r":"-")
 			<< ((S_IWOTH & s.st_mode)?"w":"-")
 			<< ((S_IXOTH & s.st_mode)?"x":"-")
-			<< "  ";
+			<< " ";
 
-		//output inode number
-		printf("%li  ", s.st_ino);
+		printf("%li ", s.st_nlink);
 
 		//get user info 
 		struct passwd* userinfo;
@@ -97,7 +96,7 @@ void printlist(vector<char*> x)
 			perror("getpwuid failed");
 			exit(1);
 		}
-		printf("%s  ", userinfo->pw_name);
+		printf("%s ", userinfo->pw_name);
 
 		//get group info
 		struct passwd* groupinfo;
@@ -107,10 +106,10 @@ void printlist(vector<char*> x)
 			perror("getpwuid failed");
 			exit(1);
 		}
-		printf("%s  ", groupinfo->pw_name);
+		printf("%s ", groupinfo->pw_name);
 
 		//print size
-		printf("%li  ", s.st_size);
+		printf("%li ", s.st_size);
 	
 		//obtain and print time last modified 
 		struct tm lastmodtime;
@@ -118,7 +117,7 @@ void printlist(vector<char*> x)
 		//create null terminated array for time output
 		char formattedtime[30];
 		strftime((char*)formattedtime, 30, "%b %d %H:%M", &lastmodtime);
-		printf("%s  ", formattedtime);
+		printf("%s ", formattedtime);
 
 
 
