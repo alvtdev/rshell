@@ -133,6 +133,7 @@ int main(int argc, char** argv)
 		{
 			delete[] filenames[j];
 		}
+		filenames.clear();
 		
 		//closedir
 		if (-1 == closedir(dirptr))

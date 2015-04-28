@@ -156,7 +156,7 @@ void printlist(const vector<char*> x)
 
 
 		//TODO: add color
-		printf("%s  ", basename(x.at(i)));
+		printf("%s \n", basename(x.at(i)));
 	}
 	
 	return;
