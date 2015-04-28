@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <time.h>
 #include <math.h>
+#include <libgen.h>
 using namespace std; 
 
 //function for comparing cstrings
@@ -49,7 +50,7 @@ void printnorm(vector<char*> x)
 	//TODO: format print accordingly.
 	for (unsigned i = 0; i < x.size(); i++)
 	{
-		printf("%s  ", x.at(i));
+		printf("%s  ", basename(x.at(i)));
 	}
 	cout << endl;
 	return;
@@ -61,7 +62,7 @@ void printlist(const vector<char*> x)
 	//initial stat call to obtain first size output format int
 	struct stat temp;
 	stat(x.at(0), &temp);
-	if (errno != 0)
+	if (errno)
 	{
 		perror("initial stat failed");
 		exit(1);
@@ -74,7 +75,7 @@ void printlist(const vector<char*> x)
 	for (unsigned j=1; j<x.size(); j++)
 	{
 		stat(x.at(j), &temp);
-		if (errno != 0)
+		if (errno)
 		{
 			perror("formatting stat failed");
 			exit(1);
@@ -154,8 +155,8 @@ void printlist(const vector<char*> x)
 		printf("%s ", formattedtime);
 
 
-
-		printf("%s\n", x.at(i));
+		//TODO: add color
+		printf("%s  ", basename(x.at(i)));
 	}
 	
 	return;

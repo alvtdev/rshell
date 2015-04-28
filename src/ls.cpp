@@ -6,6 +6,7 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <errno.h>
+#include <linux/limits.h>
 
 //custom ls header file
 #include "ls.h"
@@ -83,17 +84,24 @@ int main(int argc, char** argv)
 			}
 			if (de->d_name[0] != '.') 
 			{
-				filenames.push_back(de->d_name);
+				char* fncstr = new char[PATH_MAX];
+				strcpy(fncstr, lsargs[i]);
+				strcat(fncstr, "/");
+				strcat(fncstr, de->d_name);
+				filenames.push_back(fncstr);
 			}
 			if (de->d_name[0] == '.' && aflag)
 			{
-				filenames.push_back(de->d_name);
+				char* fncstr = new char[PATH_MAX];
+				strcpy(fncstr, lsargs[i]);
+				strcat(fncstr, "/");
+				strcat(fncstr, de->d_name);
+				filenames.push_back(fncstr);
 			}
 		}
 		delete[] de;
-	}
 		
-	sort(filenames.begin(), filenames.end(), compcstrings);
+		sort(filenames.begin(), filenames.end(), compcstrings);
 
 //test output for checking contents of filenames vector
 /*
@@ -104,22 +112,35 @@ int main(int argc, char** argv)
 
 	//print branches and conditions
 
-	if (Rflag == true)
-	{
-	}
-	else if (lflag == true)
-	{
-		printlist(filenames);
-	}
-	else
-	{
-		printnorm(filenames);
+	//if multiple ls args were put in, print folder first
+		if (lsargs.size() >= 2) printf("%s:\n", lsargs.at(i));
+
+		if (Rflag == true)
+		{
+		}
+		else if (lflag == true)
+		{
+			printlist(filenames);
+		}
+		else
+		{
+			printnorm(filenames);
+		}
+		if (lsargs.size() >= 2 && i != (lsargs.size()-1)) printf("\n");
+
+		//deallocate filenames memory
+		for(unsigned j=0; j < filenames.size(); j++)
+		{
+			delete[] filenames[j];
+		}
+		
+		//closedir
+		if (-1 == closedir(dirptr))
+		{
+			perror("closedir failed");
+			exit(1);
+		}
 	}
 
-	if (-1 == closedir(dirptr))
-	{
-		perror("closedir failed");
-		exit(1);
-	}
 	return 0;
 }
