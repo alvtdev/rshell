@@ -5,7 +5,7 @@
 Rshell is a simple shell for unix systems that students in the UCR CS100 course are required to create.
 It is essentially an unfinished, more limited version of Bash.
 
-###Current Features
+###Current Features (Rshell)
 * Executes commands (e.g. ls, mkdir, etc.)
 * Supports comments (commands entered in as a comment will not be executed)
 * handles "exit".
@@ -13,11 +13,19 @@ It is essentially an unfinished, more limited version of Bash.
 * prints a "Goodbye" message when terminated.
 * A syntax error message will be printed when one is detected. (e.g. ls &&&&&&& ; ||||)
 
-###Known bugs
+###Known bugs (Rshell)
 (that need to, and will, be fixed)
 * Any command entered that begins with a semicolon or forward slash causes an error. (e.g. ;ls)
 * Unable to run rshell within rshell; (bin/rshell gives a permission denied message)
 * Some memory leaks occur. 
 * bin/rshell returns a "permission denied" message (not entirely sure if this is a bug with rshell)
 
+###Current features (ls)
+* parameters and flags are accepted in any arbitrary order.
+* -a, -l, and -R are accepted.
 
+###Known Bugs (ls)
+* ls will list all hidden files (alphabetized) before not hidden files. (as opposed to the GNU ls sorting them alphabetically regardless of whether it is a hidden file or not)
+(the following are not exactly bugs but are steps that need to be taken to finish the ls program)
+* the -R flag is still in progress.
+* currently does not output colored text 
