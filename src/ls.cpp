@@ -113,7 +113,7 @@ int main(int argc, char** argv)
 	//print branches and conditions
 
 	//if multiple ls args were put in, print folder first
-		if (lsargs.size() >= 2) printf("%s:\n", lsargs.at(i));
+		if (lsargs.size() >= 2 || Rflag) printf("%s:\n", lsargs.at(i));
 
 		if (Rflag == true)
 		{
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
 		//deallocate filenames memory
 		for(unsigned j=0; j < filenames.size(); j++)
 		{
-			delete[] filenames[j];
+			delete[] filenames.at(j);
 		}
 		filenames.clear();
 		

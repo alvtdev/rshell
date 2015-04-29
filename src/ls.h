@@ -71,6 +71,7 @@ void printlist(const vector<char*> x)
 	//integer used to format printf for size output
 	int sizeform = log10(temp.st_size)+1;
 
+
 	//now iterate through the rest of the files to find largest size
 	for (unsigned j=1; j<x.size(); j++)
 	{
@@ -80,11 +81,30 @@ void printlist(const vector<char*> x)
 			perror("formatting stat failed");
 			exit(1);
 		}
+		//if the length is larger than existing documented length, overwrite 
 		if ((log10(temp.st_size)+1) > sizeform) 
 		{
 			sizeform = log10(temp.st_size)+1;
 		}
 	}
+
+	//integer used to count number of blocks used
+	int blockcount = 0;
+	struct stat tempblockcount;
+	for (unsigned i=0; i<x.size(); i++) 
+	{
+		stat(x.at(i), &tempblockcount);
+		if (errno)
+		{
+			perror("block count stat failed");
+			exit(1);
+		}
+		blockcount += tempblockcount.st_blocks;
+	}
+
+
+	//first output total blocks used
+	printf("total %i\n", blockcount/2);
 
 	//iterate through and print out all info
 	for (unsigned i=0; i< x.size(); i++)
