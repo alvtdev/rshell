@@ -60,89 +60,91 @@ int main(int argc, char** argv)
 		lsargs.push_back((char*)".");
 	}
 
-	//vector that stores all filenames in directory
-	vector<char*> filenames;
-
-	//get directory pointer 
-	DIR* dirptr; 
-	for (unsigned i=0; i < lsargs.size(); i++)
+	if (Rflag == true)
 	{
-		//cout << "opendir called on: " << lsargs[i] << endl;
-		dirptr = opendir(lsargs[i]);
-		if (dirptr == NULL)
+	}
+	else
+	{
+		//vector that stores all filenames in directory
+		vector<char*> filenames;
+
+		//get directory pointer 
+		DIR* dirptr; 
+		for (unsigned i=0; i < lsargs.size(); i++)
 		{
-			perror("opendir failed");
-			exit(1);
-		}
-		//get directory entry pointers and store file names
-		struct dirent* de;
-		while (de = readdir(dirptr))
-		{
-			if (errno !=0) 
+			//cout << "opendir called on: " << lsargs[i] << endl;
+			dirptr = opendir(lsargs[i]);
+			if (dirptr == NULL)
 			{
-				perror("readdir failed");
+				perror("opendir failed");
 				exit(1);
 			}
-			if (de->d_name[0] != '.') 
+			//get directory entry pointers and store file names
+			struct dirent* de;
+			while (de = readdir(dirptr))
 			{
-				char* fncstr = new char[PATH_MAX];
-				strcpy(fncstr, lsargs[i]);
-				strcat(fncstr, "/");
-				strcat(fncstr, de->d_name);
-				filenames.push_back(fncstr);
+				if (errno !=0) 
+				{
+					perror("readdir failed");
+					exit(1);
+				}
+				if (de->d_name[0] != '.') 
+				{
+					char* fncstr = new char[PATH_MAX];
+					strcpy(fncstr, lsargs[i]);
+					strcat(fncstr, "/");
+					strcat(fncstr, de->d_name);
+					filenames.push_back(fncstr);
+				}
+				if (de->d_name[0] == '.' && aflag)
+				{
+					char* fncstr = new char[PATH_MAX];
+					strcpy(fncstr, lsargs[i]);
+					strcat(fncstr, "/");
+					strcat(fncstr, de->d_name);
+					filenames.push_back(fncstr);
+				}
 			}
-			if (de->d_name[0] == '.' && aflag)
+			delete[] de;
+			
+			sort(filenames.begin(), filenames.end(), compcstrings);
+
+	//test output for checking contents of filenames vector
+	/*
+		for (unsigned i=0; i < filenames.size(); i++)
+			cout << filenames.at(i) << ' ';
+		cout << endl;
+	*/
+
+		//print branches and conditions
+
+		//if multiple ls args were put in, print folder first
+			if (lsargs.size() >= 2 || Rflag) printf("%s:\n", lsargs.at(i));
+
+			else if (lflag == true)
 			{
-				char* fncstr = new char[PATH_MAX];
-				strcpy(fncstr, lsargs[i]);
-				strcat(fncstr, "/");
-				strcat(fncstr, de->d_name);
-				filenames.push_back(fncstr);
+				printlist(filenames);
 			}
-		}
-		delete[] de;
-		
-		sort(filenames.begin(), filenames.end(), compcstrings);
+			else
+			{
+				printnorm(filenames);
+			}
+			if (lsargs.size() >= 2 && i != (lsargs.size()-1)) printf("\n");
 
-//test output for checking contents of filenames vector
-/*
-	for (unsigned i=0; i < filenames.size(); i++)
-		cout << filenames.at(i) << ' ';
-	cout << endl;
-*/
-
-	//print branches and conditions
-
-	//if multiple ls args were put in, print folder first
-		if (lsargs.size() >= 2 || Rflag) printf("%s:\n", lsargs.at(i));
-
-		if (Rflag == true)
-		{
-		}
-		else if (lflag == true)
-		{
-			printlist(filenames);
-		}
-		else
-		{
-			printnorm(filenames);
-		}
-		if (lsargs.size() >= 2 && i != (lsargs.size()-1)) printf("\n");
-
-		//deallocate filenames memory
-		for(unsigned j=0; j < filenames.size(); j++)
-		{
-			delete[] filenames.at(j);
-		}
-		filenames.clear();
-		
-		//closedir
-		if (-1 == closedir(dirptr))
-		{
-			perror("closedir failed");
-			exit(1);
+			//deallocate filenames memory
+			for(unsigned j=0; j < filenames.size(); j++)
+			{
+				delete[] filenames.at(j);
+			}
+			filenames.clear();
+			
+			//closedir
+			if (-1 == closedir(dirptr))
+			{
+				perror("closedir failed");
+				exit(1);
+			}
 		}
 	}
-
 	return 0;
 }

@@ -86,7 +86,6 @@ void printnorm(vector<char*> x)
 		{
 			printf("%s  ", basename(x.at(i)));
 		}
-		printf("\n");
 	}
 	//else print accordingly
 	else
@@ -131,6 +130,7 @@ void printnorm(vector<char*> x)
 		}
 	}
 
+	printf("\n");
 	return;
 }
 
