@@ -60,10 +60,15 @@ int main(int argc, char** argv)
 		lsargs.push_back((char*)".");
 	}
 
+	//call recursive ls function if Rflag is set
 	if (Rflag == true)
 	{
+		cout << "RECURSIVE CALL!" << endl;
+		lsrec(lsargs, aflag, lflag, Rflag);
 	}
-	else
+
+	//else, recursive call is not necessary.
+	else if (Rflag == false)
 	{
 		//vector that stores all filenames in directory
 		vector<char*> filenames;
@@ -108,14 +113,7 @@ int main(int argc, char** argv)
 			delete[] de;
 			
 			sort(filenames.begin(), filenames.end(), compcstrings);
-
-	//test output for checking contents of filenames vector
-	/*
-		for (unsigned i=0; i < filenames.size(); i++)
-			cout << filenames.at(i) << ' ';
-		cout << endl;
-	*/
-
+			
 		//print branches and conditions
 
 		//if multiple ls args were put in, print folder first
