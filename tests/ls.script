@@ -1,0 +1,155 @@
+Script started on Fri 01 May 2015 11:09:13 PM PDT
+~/rshell
+athai005@hammer $ bin/ls
+bin  LICENSE  Makefile  Makefile~  README.md  README.md~  src  tests  
+~/rshell
+athai005@hammer $ bin/ls -a
+.  ..  .git  .README.md.swp  bin  LICENSE  Makefile  Makefile~  README.md  README.md~  src  tests  
+~/rshell
+athai005@hammer $ bin/ls -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a
+.  ..  .git  .README.md.swp  bin  LICENSE  Makefile  Makefile~  README.md  README.md~  src  tests  
+~/rshell
+athai005@hammer $ bin/ls -aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+.  ..  .git  .README.md.swp  bin  LICENSE  Makefile  Makefile~  README.md  README.md~  src  tests  
+~/rshell
+athai005@hammer $ bin/ls -l
+total 32
+drwx------ 2 athai005 athai005 4096 May 01 22:50 bin 
+do_ypcall: clnt_call: RPC: Unable to send; errno = Operation not permitted
+-rw------- 1 athai005 athai005 1076 Apr 26 17:05 LICENSE 
+-rw------- 1 athai005 athai005  276 May 01 22:22 Makefile 
+-rw------- 1 athai005 athai005  270 May 01 22:22 Makefile~ 
+-rw------- 1 athai005 athai005 1653 May 01 23:00 README.md 
+-rw------- 1 athai005 athai005 1522 May 01 22:55 README.md~ 
+drwx------ 3 athai005 athai005 4096 May 01 22:59 src 
+drwx------ 2 athai005 athai005 4096 May 01 23:03 tests 
+~/rshell
+athai005@hammer $ bin/ls -al
+total 60
+drwx------ 6 athai005 athai005  4096 May 01 23:00 . 
+drwx------ 37 athai005 athai005  8192 May 01 22:59 .. 
+drwx------ 8 athai005 athai005  4096 May 01 23:00 .git 
+-rw------- 1 athai005 athai005 12288 May 01 23:00 .README.md.swp 
+drwx------ 2 athai005 athai005  4096 May 01 22:50 bin 
+-rw------- 1 athai005 athai005  1076 Apr 26 17:05 LICENSE 
+-rw------- 1 athai005 athai005   276 May 01 22:22 Makefile 
+-rw------- 1 athai005 athai005   270 May 01 22:22 Makefile~ 
+-rw------- 1 athai005 athai005  1653 May 01 23:00 README.md 
+-rw------- 1 athai005 athai005  1522 May 01 22:55 README.md~ 
+drwx------ 3 athai005 athai005  4096 May 01 22:59 src 
+drwx------ 2 athai005 athai005  4096 May 01 23:03 tests 
+~/rshell
+athai005@hammer $ bin/ls -l
+total 32
+drwx------ 2 athai005 athai005 4096 May 01 22:50 bin 
+-rw------- 1 athai005 athai005 1076 Apr 26 17:05 LICENSE 
+-rw------- 1 athai005 athai005  276 May 01 22:22 Makefile 
+-rw------- 1 athai005 athai005  270 May 01 22:22 Makefile~ 
+-rw------- 1 athai005 athai005 1653 May 01 23:00 README.md 
+-rw------- 1 athai005 athai005 1522 May 01 22:55 README.md~ 
+drwx------ 3 athai005 athai005 4096 May 01 22:59 src 
+drwx------ 2 athai005 athai005 4096 May 01 23:03 tests 
+~/rshell
+athai005@hammer $ #nore [K[K[K[K[Knot sure why the "co-[K[K[K  do_ypcall" error appeared
+~/rshell
+athai005@hammer $ bin/ls -alalalalalalalalalllaaaallllaalllaalalalalalalal
+total 60
+do_ypcall: clnt_call: RPC: Unable to send; errno = Operation not permitted
+drwx------ 6 athai005 athai005  4096 May 01 23:00 . 
+drwx------ 37 athai005 athai005  8192 May 01 22:59 .. 
+drwx------ 8 athai005 athai005  4096 May 01 23:00 .git 
+-rw------- 1 athai005 athai005 12288 May 01 23:00 .README.md.swp 
+drwx------ 2 athai005 athai005  4096 May 01 22:50 bin 
+-rw------- 1 athai005 athai005  1076 Apr 26 17:05 LICENSE 
+-rw------- 1 athai005 athai005   276 May 01 22:22 Makefile 
+-rw------- 1 athai005 athai005   270 May 01 22:22 Makefile~ 
+-rw------- 1 athai005 athai005  1653 May 01 23:00 README.md 
+-rw------- 1 athai005 athai005  1522 May 01 22:55 README.md~ 
+drwx------ 3 athai005 athai005  4096 May 01 22:59 src 
+drwx------ 2 athai005 athai005  4096 May 01 23:03 tests 
+~/rshell
+athai005@hammer $ bin/ls -alalalalalalalalalllaaaallllaalllaalalalalalalal
+total 60
+drwx------ 6 athai005 athai005  4096 May 01 23:00 . 
+drwx------ 37 athai005 athai005  8192 May 01 22:59 .. 
+drwx------ 8 athai005 athai005  4096 May 01 23:00 .git 
+-rw------- 1 athai005 athai005 12288 May 01 23:00 .README.md.swp 
+drwx------ 2 athai005 athai005  4096 May 01 22:50 bin 
+-rw------- 1 athai005 athai005  1076 Apr 26 17:05 LICENSE 
+-rw------- 1 athai005 athai005   276 May 01 22:22 Makefile 
+-rw------- 1 athai005 athai005   270 May 01 22:22 Makefile~ 
+-rw------- 1 athai005 athai005  1653 May 01 23:00 README.md 
+-rw------- 1 athai005 athai005  1522 May 01 22:55 README.md~ 
+drwx------ 3 athai005 athai005  4096 May 01 22:59 src 
+drwx------ 2 athai005 athai005  4096 May 01 23:03 tests 
+~/rshell
+athai005@hammer $ bin/ls bin
+cp  ls  rshell  
+~/rshell
+athai005@hammer $ bin/ls bin src
+bin:
+
+src:
+~/rshell
+athai005@hammer $ bin/ls src
+a.out  cp.cpp  cp.cpp~  ls.cpp  ls.cpp~  ls.h  ls.h~  main.cpp  test  Timer.h  
+~/rshell
+athai005@hammer $ bin /[K[K/ls bin -l
+total 104
+-rwx------ 1 athai005 athai005 18578 May 01 22:50 cp 
+-rwx------ 1 athai005 athai005 51090 May 01 22:50 ls 
+-rwx------ 1 athai005 athai005 30036 May 01 22:50 rshell 
+~/rshell
+athai005@hammer $ bin/ls bin -a -l
+total 112
+drwx------ 2 athai005 athai005  4096 May 01 22:50 . 
+drwx------ 6 athai005 athai005  4096 May 01 23:00 .. 
+-rwx------ 1 athai005 athai005 18578 May 01 22:50 cp 
+-rwx------ 1 athai005 athai005 51090 May 01 22:50 ls 
+-rwx------ 1 athai005 athai005 30036 May 01 22:50 rshell 
+~/rshell
+athai005@hammer $ bin/ls bin -al
+total 112
+drwx------ 2 athai005 athai005  4096 May 01 22:50 . 
+drwx------ 6 athai005 athai005  4096 May 01 23:00 .. 
+-rwx------ 1 athai005 athai005 18578 May 01 22:50 cp 
+-rwx------ 1 athai005 athai005 51090 May 01 22:50 ls 
+-rwx------ 1 athai005 athai005 30036 May 01 22:50 rshell 
+~/rshell
+athai005@hammer $ bin/ls bin -a[Kla
+total 112
+drwx------ 2 athai005 athai005  4096 May 01 22:50 . 
+drwx------ 6 athai005 athai005  4096 May 01 23:00 .. 
+-rwx------ 1 athai005 athai005 18578 May 01 22:50 cp 
+-rwx------ 1 athai005 athai005 51090 May 01 22:50 ls 
+-rwx------ 1 athai005 athai005 30036 May 01 22:50 rshell 
+~/rshell
+athai005@hammer $ #parameters and flags can be arbitrary
+~/rshell
+athai005@hammer $ bin/ls -la bin
+total 112
+drwx------ 2 athai005 athai005  4096 May 01 22:50 . 
+drwx------ 6 athai005 athai005  4096 May 01 23:00 .. 
+-rwx------ 1 athai005 athai005 18578 May 01 22:50 cp 
+-rwx------ 1 athai005 athai005 51090 May 01 22:50 ls 
+-rwx------ 1 athai005 athai005 30036 May 01 22:50 rshell 
+~/rshell
+athai005@hammer $ bin/ls -l -a -a -l bin
+total 112
+drwx------ 2 athai005 athai005  4096 May 01 22:50 . 
+drwx------ 6 athai005 athai005  4096 May 01 23:00 .. 
+-rwx------ 1 athai005 athai005 18578 May 01 22:50 cp 
+-rwx------ 1 athai005 athai005 51090 May 01 22:50 ls 
+-rwx------ 1 athai005 athai005 30036 May 01 22:50 rshell 
+~/rshell
+athai005@hammer $ bin/ls -l bin -a
+total 112
+drwx------ 2 athai005 athai005  4096 May 01 22:50 . 
+drwx------ 6 athai005 athai005  4096 May 01 23:00 .. 
+-rwx------ 1 athai005 athai005 18578 May 01 22:50 cp 
+-rwx------ 1 athai005 athai005 51090 May 01 22:50 ls 
+-rwx------ 1 athai005 athai005 30036 May 01 22:50 rshell 
+~/rshell
+athai005@hammer $ exit
+
+Script done on Fri 01 May 2015 11:14:05 PM PDT
