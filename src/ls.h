@@ -68,7 +68,7 @@ void printnorm(vector<char*> x)
 	bool multline = false; //if false, 2 spaces between file names
 
 	//first iterate through to determine if multiple lines neet to be printed
-	int tempsizecount = 0;
+	unsigned int tempsizecount = 0;
 	for (unsigned i=0; i < x.size(); i++)
 	{ 
 		tempsizecount += (strlen(basename(x.at(i)))+2); //+2 accounts for spaces
@@ -98,7 +98,7 @@ void printnorm(vector<char*> x)
 		sperl = w.ws_col;
 
 		//loop to find size of largest name
-		int bnlen = strlen(basename(x.at(0)));
+		unsigned int bnlen = strlen(basename(x.at(0)));
 		//test output
 		//cout << "longest file name: " << basename(x.at(0)) << endl;
 		//cout << "file name length: " << bnlen << endl;
@@ -279,7 +279,7 @@ vector<char*> printnormrh(const vector<char*> x)
 	bool multline = false; //if false, 2 spaces between file names
 
 	//first iterate through to determine if multiple lines neet to be printed
-	int tempsizecount = 0;
+	unsigned int tempsizecount = 0;
 	for (unsigned i=0; i < x.size(); i++)
 	{ 
 		tempsizecount += (strlen(basename(x.at(i)))+2); //+2 accounts for spaces
@@ -306,7 +306,7 @@ vector<char*> printnormrh(const vector<char*> x)
 		sperl = w.ws_col;
 
 		//loop to find size of largest name
-		int bnlen = strlen(basename(x.at(0)));
+		unsigned int bnlen = strlen(basename(x.at(0)));
 		for (unsigned i = 0; i < x.size(); i++)
 		{
 			if (strlen(basename(x.at(i))) > bnlen)
@@ -480,6 +480,7 @@ vector<char*> printlistrh(const vector<char*> x)
 			
 			if (S_IFDIR & s.st_mode)
 			{
+				cout << x.at(i) << "is a directory" << endl;
 				retdir.push_back(x.at(i));
 			}
 
@@ -504,7 +505,7 @@ void lsrec (vector<char*> lsargs, bool aflag, bool lflag, bool Rflag)
 		
 		//get firectory entry pointers and store file names
 		struct dirent* de;
-		while (de = readdir(dirptr))
+		while ((de = readdir(dirptr)))
 		{
 			if (errno != 0)
 			{

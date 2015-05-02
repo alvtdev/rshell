@@ -31,32 +31,9 @@ int main(int argc, char* argv[])
 	strcpy(srcf, argv[1]);
 	char dstf[BUFSIZ];
 	strcpy(dstf, argv[2]);
-	bool fileexists = false;
 	vector<char*> filenames;
-	DIR* dirptr;
-	struct dirent* de;
 	struct stat s;
 
-/*
-	//check if source file already exists
-	dirptr = opendir(dirname(srcf));
-	if (dirptr == NULL)
-	{
-		perror("opendir failed");
-		exit(1);
-	}
-	while (de = readdir(dirptr))
-	{
-		if(errno)
-		{
-			perror("readdir failed");
-			exit(1);
-		}
-		char* fncstr = new char[PATH_MAX];
-		strcpy(fncstr, de->d_name);
-		filenames.push_back(fncstr);
-	}
-*/
 
 	if ( -1 == stat(srcf, &s))
 	{
@@ -65,63 +42,12 @@ int main(int argc, char* argv[])
 	}
 	
 
-/*	
-	delete[] de;
-	//deallocate filenames memory after check
-	for(unsigned j=0; j < filenames.size(); j++)
-	{
-		delete[] filenames.at(j); 
-	}
-	filenames.clear();
-	//closedir
-	if (-1 == closedir(dirptr))
-	{
-		perror("closedir failed");
-		exit(1);
-	}
-*/
-
-/*
-	//check if destination file already exists
-	dirptr = opendir(dirname(dstf));
-	if (dirptr == NULL)
-	{
-		perror("opendir failed");
-		exit(1);
-	}
-	while (de = readdir(dirptr))
-	{
-		if(errno)
-		{
-			perror("readdir failed");
-			exit(1);
-		}
-		char* fncstr = new char[PATH_MAX];
-		strcpy(fncstr, de->d_name);
-		filenames.push_back(fncstr);
-	}
-*/
 	struct stat t1;
 	if (0 == stat(dstf, &t1))
 	{
 		cout << "ERROR:destination file already exists" << endl; 
 		exit (1);
 	}
-/*	
-	delete[] de;
-	//deallocate filenames memory after check
-	for(unsigned j=0; j < filenames.size(); j++)
-	{
-		delete[] filenames.at(j); 
-	}
-	filenames.clear();
-	//closedir
-	if (-1 == closedir(dirptr))
-	{
-		perror("closedir failed");
-		exit(1);
-	}
-*/
 	
 	
 

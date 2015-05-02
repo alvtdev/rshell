@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	vector<char*> lsargs;
 
 	//sort through args for flags or directories
-	for (unsigned i=1; i < argc; i++)
+	for (int i=1; i < argc; i++)
 	{
 		//if first char in char** is '-', the argument is a flag
 		if (argv[i][0] == '-')
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 			}
 			//get directory entry pointers and store file names
 			struct dirent* de;
-			while (de = readdir(dirptr))
+			while ((de = readdir(dirptr)))
 			{
 				if (errno !=0) 
 				{
