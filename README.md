@@ -22,10 +22,10 @@ It is essentially an unfinished, more limited version of Bash.
 
 ###Current features (ls)
 * parameters and flags are accepted in any arbitrary order.
-* -a, -l, and -R are accepted.
+* -a, -l, and -R are accepted as flags
 
 ###Known Bugs (ls)
 * ls will list all hidden files (alphabetized) before not hidden files. (as opposed to the GNU ls sorting them alphabetically regardless of whether it is a hidden file or not)
+* The -R flag calls ls, but will not recursively call itself on other directories within a directory.
 (the following are not exactly bugs but are steps that need to be taken to finish the ls program)
-* the -R flag is still in progress.
 * currently does not output colored text 
