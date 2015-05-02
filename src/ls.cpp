@@ -67,6 +67,7 @@ int main(int argc, char** argv)
 	DIR* dirptr; 
 	for (unsigned i=0; i < lsargs.size(); i++)
 	{
+		//cout << "opendir called on: " << lsargs[i] << endl;
 		dirptr = opendir(lsargs[i]);
 		if (dirptr == NULL)
 		{
