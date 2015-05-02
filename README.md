@@ -27,5 +27,6 @@ It is essentially an unfinished, more limited version of Bash.
 ###Known Bugs (ls)
 * ls will list all hidden files (alphabetized) before not hidden files. (as opposed to the GNU ls sorting them alphabetically regardless of whether it is a hidden file or not)
 * The -R flag calls ls, but will not recursively call itself on other directories within a directory.
+* calling ls on a file instead of a directory causes an error (as opposed to the GNU ls outputting the name of the file passed in)
 (the following are not exactly bugs but are steps that need to be taken to finish the ls program)
 * currently does not output colored text 
