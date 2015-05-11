@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <linux/limits.h>
 using namespace std;
 
 void printprompt()
@@ -136,10 +137,38 @@ bool makecmds(const string parsedinput, vector<string> &cmds)
 					i++;
 				}
 			}
+			if (parsedinput.at(i) == '>')
+			{
+				if (parsedinput.at(i+1) == '>') 
+				{
+					cmds.push_back(">>");
+					i+=2;
+					if (i > parsedinput.size()) return true;
+					continue;
+				}
+				else 
+				{
+					cmds.push_back(">");
+					i++;
+					continue;
+				}
+			}
+			if (parsedinput.at(i) == '|')
+			{
+				cmds.push_back("|");
+				i++;
+				continue;
+			}
+			if (parsedinput.at(i) == '<')
+			{
+				cmds.push_back("<");
+				i++;
+				continue;
+			}
 			else if (parsedinput.at(i) != ' ')
 			{
 				parsecmd += parsedinput.at(i);
-				if (!isalpha(parsedinput.at(i+1)))
+				if (!isalpha(parsedinput.at(i+1)) && parsedinput.at(i+1) != '.')
 				{
 					cmds.push_back(parsecmd);
 					parsecmd.clear();
@@ -149,7 +178,9 @@ bool makecmds(const string parsedinput, vector<string> &cmds)
 		seploopdone = true;
 	}
 
+	//preliminary syntax error checks before exec command call
 	if (cmds.at(cmds.size()-1) == "&&" || cmds.at(cmds.size()-1) == "||") return true;
+	if (cmds.at(0) == ";") return true;
 
 	else
 	{
@@ -163,18 +194,22 @@ bool execcmds(const vector<string> &cmds)
 	vector<string> newvec;
 	for (unsigned i = 0; i < cmds.size(); i++)
 	{
-		if (cmds.at(0) == ";") 
+		if (cmds.at(i) == "<" || cmds.at(i) == ">" || cmds.at(i) == ">>" || cmds.at(i) == "|")
 		{
-			return true;
+			//if && and || are found after a redirection symbol -- syntax error
+			if (cmds.at(i+1) == "&&" || cmds.at(i+1) == "||")  return true;
+			//if characters are first thing input -- syntax error
+			if (i == 0) return true;
+
+
 		}
+
+
 		if (cmds.at(i) == "&&" || cmds.at(i) == "||" || cmds.at(i) == ";")
 		{
 
 			//if "&& ; " or "|| ;" was entered -- syntax error
-			if ((cmds.at(i) == "&&" || cmds.at(i) == "||") && cmds.at(i+1) == ";")
-			{
-				return true;
-			}
+			if ((cmds.at(i) == "&&" || cmds.at(i) == "||") && cmds.at(i+1) == ";") return true;
 
 			//else, proceed to convert to char** and call execvp
 			char** newargv = new char*[newvec.size()+1];
