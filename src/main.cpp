@@ -26,13 +26,12 @@ int main (int argc, char** argv)
 			//bool will store syntax error
 			bool synerror = makecmds(parsedinput, cmds);
 			//test output: print contents of cmds
-/*
 			cout << "-- Contents of cmds --" << endl; 
 			for (unsigned i=0; i<cmds.size(); i++)
 			{
-				cout << "cmds.at(" << i << "): " << cmds.at(i) << endl;
+				cout << "cmds.at(" << i << "): " << cmds.at(i) << endl << endl;
 			}
-*/
+			
 			if (synerror != true)	synerror = execcmds(cmds);
 			if (synerror == true)	printf("Syntax error.\n");
 		}

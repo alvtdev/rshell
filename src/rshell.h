@@ -137,9 +137,10 @@ bool makecmds(const string parsedinput, vector<string> &cmds)
 					cmds.push_back(constring);
 					parsecmd.clear();
 					i++;
+					continue;
 				}
 			}
-			if (parsedinput.at(i) == '>')
+			else if (parsedinput.at(i) == '>')
 			{
 				if (parsedinput.at(i+1) == '>') 
 				{
@@ -155,13 +156,13 @@ bool makecmds(const string parsedinput, vector<string> &cmds)
 					continue;
 				}
 			}
-			if (parsedinput.at(i) == '|')
+			else if (parsedinput.at(i) == '|')
 			{
 				cmds.push_back("|");
 				i++;
 				continue;
 			}
-			if (parsedinput.at(i) == '<')
+			else if (parsedinput.at(i) == '<')
 			{
 				cmds.push_back("<");
 				i++;
@@ -200,6 +201,7 @@ bool execcmds(const vector<string> &cmds)
 	vector<string> newvec;
 	for (unsigned i = 0; i < cmds.size(); i++)
 	{
+		unsigned temp = i;
 		//check for syntax errors with redirection symbols
 		if (cmds.at(i) == "<" || cmds.at(i) == ">" || cmds.at(i) == ">>" || cmds.at(i) == "|")
 		{
@@ -217,6 +219,9 @@ bool execcmds(const vector<string> &cmds)
 			//if "&& ; " or "|| ;" was entered -- syntax error
 			if ((cmds.at(i) == "&&" || cmds.at(i) == "||") && cmds.at(i+1) == ";") return true;
 
+			if ((i-1 > 0) && (cmds.at(i-1) == "<" || cmds.at(i-1) == ">" || cmds.at(i-1) == ">>" || cmds.at(i-1) == "|")) continue;
+
+
 			//else, proceed to convert to char** and call execvp
 			char** newargv = new char*[newvec.size()+1];
 			for (unsigned j = 0; j < newvec.size(); j++)
@@ -225,6 +230,9 @@ bool execcmds(const vector<string> &cmds)
 				strcpy(newargv[j], newvec.at(j).c_str());
 			}
 			newargv[newvec.size()] = '\0';
+
+
+		cout << "execvp called on " << newargv[0] << endl;
 
 			int execret = 0; //keeps track of exec return value. init to 0
 			int pid = fork();
@@ -322,9 +330,9 @@ bool execcmds(const vector<string> &cmds)
 				}
 				delete[] newargv;
 			}
-			if (cmds.at(i) == "&&" && cmds.at(i-1) == "false") return false;
-			if (cmds.at(i) == "||" && execret == 0 && cmds.at(i-1) != "false") return false; 
-			if (cmds.at(i) == ";" && i == cmds.size()-1) return false;
+			if (cmds.at(temp) == "&&" && cmds.at(i-1) == "false") return false;
+			if (cmds.at(temp) == "||" && execret == 0 && cmds.at(i-1) != "false") return false; 
+			if (cmds.at(temp) == ";" && i == cmds.size()-1) return false;
 		}
 		else if (cmds.at(i) == "exit" && (cmds.at(i-1) == ";" || cmds.at(i-1) == "&&"))
 		{
