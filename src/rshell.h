@@ -198,7 +198,9 @@ bool execcmds(const vector<string> &cmds)
 	vector<string> newvec;
 	for (unsigned i = 0; i < cmds.size(); i++)
 	{
-		//unsigned temp = i;
+		//temp is the position of the argument after a redireection operator is found
+		unsigned temp = i;
+
 		//check for syntax errors with redirection symbols
 		if (cmds.at(i) == "<" || cmds.at(i) == ">" || cmds.at(i) == ">>" || cmds.at(i) == "|")
 		{
@@ -206,6 +208,11 @@ bool execcmds(const vector<string> &cmds)
 			if (cmds.at(i+1) == "&&" || cmds.at(i+1) == "||")  return true;
 			//if characters are first thing input -- syntax error
 			if (i == 0) return true;
+			temp = i+1;
+
+			//check for output redirect
+			//if complementary output redirection, temp+=2
+			if (cmds.at(temp+1) == ">" || cmds.at(temp+1) == ">>") temp+=2;
 		}
 
 
@@ -217,6 +224,7 @@ bool execcmds(const vector<string> &cmds)
 			if ((cmds.at(i) == "&&" || cmds.at(i) == "||") && cmds.at(i+1) == ";") return true;
 
 			//if ((i-1 > 0) && (cmds.at(i-1) == "<" || cmds.at(i-1) == ">" || cmds.at(i-1) == ">>" || cmds.at(i-1) == "|")) continue;
+			
 
 
 			//else, proceed to convert to char** and call execvp
@@ -240,7 +248,7 @@ bool execcmds(const vector<string> &cmds)
 			*/
 
 
-		cout << "execvp called on " << newargv[0] << endl;
+		  //cout << "execvp called on " << newargv[0] << endl;
 
 			int execret = 0; //keeps track of exec return value. init to 0
 			int pid = fork();
@@ -342,6 +350,9 @@ bool execcmds(const vector<string> &cmds)
 			if (cmds.at(i) == "&&" && cmds.at(i-1) == "false") return false;
 			if (cmds.at(i) == "||" && execret == 0 && cmds.at(i-1) != "false") return false; 
 			if (cmds.at(i) == ";" && i == cmds.size()-1) return false;
+			if (temp > i) i = temp;
+//			cout << "new i = " << i << ", " << cmds.at(i) << endl;
+			if (i==cmds.size()-2) return false;
 		}
 		else if (cmds.at(i) == "exit" && (cmds.at(i-1) == ";" || cmds.at(i-1) == "&&"))
 		{
