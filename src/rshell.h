@@ -10,8 +10,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <linux/limits.h>
+#include <fcntl.h>
 using namespace std;
 
 void printprompt()
@@ -168,7 +170,7 @@ bool makecmds(const string parsedinput, vector<string> &cmds)
 			else if (parsedinput.at(i) != ' ')
 			{
 				parsecmd += parsedinput.at(i);
-				if (!isalpha(parsedinput.at(i+1)) && parsedinput.at(i+1) != '.')
+				if ((!isalpha(parsedinput.at(i+1)) && !isdigit(parsedinput.at(i+1))) && parsedinput.at(i+1) != '.')
 				{
 					cmds.push_back(parsecmd);
 					parsecmd.clear();
@@ -191,21 +193,25 @@ bool makecmds(const string parsedinput, vector<string> &cmds)
 
 bool execcmds(const vector<string> &cmds)
 {
+	//input and output file handles, set to -1 so it won't interfere with other file descriptors
+	int in = -1;
+	int out = -1;
+
 	vector<string> newvec;
 	for (unsigned i = 0; i < cmds.size(); i++)
 	{
+		//check for syntax errors with redirection symbols
 		if (cmds.at(i) == "<" || cmds.at(i) == ">" || cmds.at(i) == ">>" || cmds.at(i) == "|")
 		{
 			//if && and || are found after a redirection symbol -- syntax error
 			if (cmds.at(i+1) == "&&" || cmds.at(i+1) == "||")  return true;
 			//if characters are first thing input -- syntax error
 			if (i == 0) return true;
-
-
 		}
 
 
-		if (cmds.at(i) == "&&" || cmds.at(i) == "||" || cmds.at(i) == ";")
+		if (cmds.at(i) == "&&" || cmds.at(i) == "||" || cmds.at(i) == ";" || 
+			cmds.at(i) == "<" || cmds.at(i) == ">" || cmds.at(i) == ">>" || cmds.at(i) == "|")
 		{
 
 			//if "&& ; " or "|| ;" was entered -- syntax error
@@ -226,6 +232,45 @@ bool execcmds(const vector<string> &cmds)
 			//if we're in the child
 			if (pid == 0)
 			{	
+				//handle input redirection
+				if (cmds.at(i) == "<")
+				{
+					++i;
+					in = open(cmds.at(i).c_str(), O_RDONLY);
+					if (in == -1)
+					{
+						perror("open in failed");
+						exit(1);
+					}
+
+					dup2(in, 0);
+				} 
+
+				//handle output redirection
+				if (cmds.at(i) == ">")
+				{
+					++i;
+					out = open(cmds.at(i).c_str(), O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
+					if (out == -1)
+					{
+						perror ("open out failed");
+						exit(1);
+					}
+					dup2(out, 1);
+					++i;
+				}
+				if (cmds.at(i) == ">>")
+				{
+					++i;
+					out = open(cmds.at(i).c_str(), O_WRONLY|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
+					if (out == -1)
+					{
+						perror ("open out failed");
+						exit(1);
+					}
+					dup2(out, 1);
+					++i;
+				}
 				execret = execvp(newargv[0], newargv);
 				if (-1 == execret)
 				{	
@@ -238,6 +283,7 @@ bool execcmds(const vector<string> &cmds)
 					exit(1);
 				}
 			}
+			//if we're in the parent
 			else 
 			{
 				if (-1 == wait(0)) 
@@ -246,12 +292,33 @@ bool execcmds(const vector<string> &cmds)
 					exit(1);
 				}
 			}
+			//close in
+			if (in != -1)
+			{
+				if (-1 == close(in))
+				{
+					perror("close in failed"); 
+					exit(1);
+				}
+				in = -1;
+			}
+			//close out
+			if (out != -1)
+			{
+				if (-1 == close(out))
+				{
+					perror("close out failed");
+					exit(1);
+				}
+				out = -1;
+			}
+			//clear all memory
 			if (newvec.size() > 0)
 			{
 				newvec.clear();
 				for (unsigned k=0; k < newvec.size(); k++)
 				{
-						delete[] newargv[i];
+						delete[] newargv[k];
 				}
 				delete[] newargv;
 			}
