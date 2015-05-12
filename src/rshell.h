@@ -145,27 +145,24 @@ bool makecmds(const string parsedinput, vector<string> &cmds)
 				if (parsedinput.at(i+1) == '>') 
 				{
 					cmds.push_back(">>");
-					i+=2;
+					i++;
 					if (i > parsedinput.size()) return true;
 					continue;
 				}
 				else 
 				{
 					cmds.push_back(">");
-					i++;
 					continue;
 				}
 			}
 			else if (parsedinput.at(i) == '|')
 			{
 				cmds.push_back("|");
-				i++;
 				continue;
 			}
 			else if (parsedinput.at(i) == '<')
 			{
 				cmds.push_back("<");
-				i++;
 				continue;
 			}
 			else if (parsedinput.at(i) != ' ')
@@ -201,7 +198,7 @@ bool execcmds(const vector<string> &cmds)
 	vector<string> newvec;
 	for (unsigned i = 0; i < cmds.size(); i++)
 	{
-		unsigned temp = i;
+		//unsigned temp = i;
 		//check for syntax errors with redirection symbols
 		if (cmds.at(i) == "<" || cmds.at(i) == ">" || cmds.at(i) == ">>" || cmds.at(i) == "|")
 		{
@@ -219,7 +216,7 @@ bool execcmds(const vector<string> &cmds)
 			//if "&& ; " or "|| ;" was entered -- syntax error
 			if ((cmds.at(i) == "&&" || cmds.at(i) == "||") && cmds.at(i+1) == ";") return true;
 
-			if ((i-1 > 0) && (cmds.at(i-1) == "<" || cmds.at(i-1) == ">" || cmds.at(i-1) == ">>" || cmds.at(i-1) == "|")) continue;
+			//if ((i-1 > 0) && (cmds.at(i-1) == "<" || cmds.at(i-1) == ">" || cmds.at(i-1) == ">>" || cmds.at(i-1) == "|")) continue;
 
 
 			//else, proceed to convert to char** and call execvp
@@ -230,6 +227,17 @@ bool execcmds(const vector<string> &cmds)
 				strcpy(newargv[j], newvec.at(j).c_str());
 			}
 			newargv[newvec.size()] = '\0';
+
+			//if a redirection operator is found, move iterator i to after redir
+			/*
+			if (cmds.at(i) == "<") 
+			{
+				for(unsigned j = i; j < cmds.size(); j++)
+				{
+					if (cmds.at(j-1) == "<" || cmds.at(j-1) == ">" || cmds.at(j-1) == ">>" || cmds.at(j-1) == "|") temp = j;
+				}
+			}
+			*/
 
 
 		cout << "execvp called on " << newargv[0] << endl;
@@ -252,6 +260,7 @@ bool execcmds(const vector<string> &cmds)
 					}
 
 					dup2(in, 0);
+					++i;
 				} 
 
 				//handle output redirection
@@ -265,7 +274,7 @@ bool execcmds(const vector<string> &cmds)
 						exit(1);
 					}
 					dup2(out, 1);
-					++i;
+					//++i;
 				}
 				if (cmds.at(i) == ">>")
 				{
@@ -277,7 +286,7 @@ bool execcmds(const vector<string> &cmds)
 						exit(1);
 					}
 					dup2(out, 1);
-					++i;
+					//++i;
 				}
 				execret = execvp(newargv[0], newargv);
 				if (-1 == execret)
@@ -330,9 +339,9 @@ bool execcmds(const vector<string> &cmds)
 				}
 				delete[] newargv;
 			}
-			if (cmds.at(temp) == "&&" && cmds.at(i-1) == "false") return false;
-			if (cmds.at(temp) == "||" && execret == 0 && cmds.at(i-1) != "false") return false; 
-			if (cmds.at(temp) == ";" && i == cmds.size()-1) return false;
+			if (cmds.at(i) == "&&" && cmds.at(i-1) == "false") return false;
+			if (cmds.at(i) == "||" && execret == 0 && cmds.at(i-1) != "false") return false; 
+			if (cmds.at(i) == ";" && i == cmds.size()-1) return false;
 		}
 		else if (cmds.at(i) == "exit" && (cmds.at(i-1) == ";" || cmds.at(i-1) == "&&"))
 		{
@@ -340,7 +349,7 @@ bool execcmds(const vector<string> &cmds)
 			printf("Goodbye\n");
 			exit(0);
 		}
-		else
+		else 
 		{
 			newvec.push_back(cmds.at(i));
 		}
