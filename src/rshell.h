@@ -220,7 +220,7 @@ bool execcmds(const vector<string> &cmds, int pcount)
 		unsigned temp = i;
 
 		//check for syntax errors with redirection symbols
-		if (cmds.at(i) == "<" || cmds.at(i) == ">" || cmds.at(i) == ">>" || cmds.at(i) == "|")
+		if (cmds.at(i) == "<" || cmds.at(i) == ">" || cmds.at(i) == ">>"/* || cmds.at(i) == "|"*/)
 		{
 			//if && and || are found after a redirection symbol -- syntax error
 			if (cmds.at(i+1) == "&&" || cmds.at(i+1) == "||")  return true;
@@ -252,6 +252,7 @@ bool execcmds(const vector<string> &cmds, int pcount)
 			newargv[newvec.size()] = '\0';
 
 			//if pipes are encountered, dup pipes
+		/*	
 			if (pcount > 0)
 			{
 					if (-1 == dup2(pipe[0], 0))
@@ -265,6 +266,7 @@ bool execcmds(const vector<string> &cmds, int pcount)
 						exit(1);
 					}
 			}
+			*/
 				
 
 		  //cout << "execvp called on " << newargv[0] << endl;
@@ -276,8 +278,18 @@ bool execcmds(const vector<string> &cmds, int pcount)
 			if (pid == 0)
 			{	
 				//handle piping
-				if (cmds.at(i) == "|")
+				if (pcount > 0 && cmds.at(i) == "|")
 				{
+					if(-1 == close(1))
+					{
+						perror("child close failed");
+						exit(1);
+					}
+					if(-1 == dup(pipefd[1]))
+					{
+						perror("child dup failed");
+						exit(1);
+					}
 				} 
 
 				//handle input redirection
@@ -356,6 +368,19 @@ bool execcmds(const vector<string> &cmds, int pcount)
 					perror("wait");
 					exit(1);
 				}
+				if (pcount > 0 && cmds.at(i) == "|")
+				{
+					if(-1 == close(0))
+					{
+						perror("parent close failed");
+						exit(1);
+					}
+					if(-1 == dup(pipefd[0]))
+					{
+						perror("parent dup failed");
+						exit(1);
+					}
+				} 
 			}
 			//close in
 			if (in != -1)
