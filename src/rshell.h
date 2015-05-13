@@ -10,7 +10,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/stat.h>
+#include <sys/stat.h> 
 #include <sys/wait.h>
 #include <linux/limits.h>
 #include <fcntl.h>
@@ -189,11 +189,29 @@ bool makecmds(const string parsedinput, vector<string> &cmds)
 	}
 }
 
-bool execcmds(const vector<string> &cmds)
+int pipecount(const string parsedinput)
+{
+	int temp = 0;
+	for (unsigned i=0; i < parsedinput.size(); i++)
+	{
+		if (parsedinput.at(i)=='|') temp++;
+	}
+	return temp;
+}
+
+bool execcmds(const vector<string> &cmds, int pcount)
 {
 	//input and output file handles, set to -1 so it won't interfere with other file descriptors
 	int in = -1;
 	int out = -1;
+	//declare pipefd in case pipes exit
+	int pipefd[2];
+	if (pipe(pipefd) == -1)
+	{
+		perror("pipe");
+		exit(1); 
+	}
+
 
 	vector<string> newvec;
 	for (unsigned i = 0; i < cmds.size(); i++)
@@ -208,6 +226,7 @@ bool execcmds(const vector<string> &cmds)
 			if (cmds.at(i+1) == "&&" || cmds.at(i+1) == "||")  return true;
 			//if characters are first thing input -- syntax error
 			if (i == 0) return true;
+			//temp int keeping track of where i should be after loop
 			temp = i+1;
 
 			//check for output redirect
@@ -223,11 +242,7 @@ bool execcmds(const vector<string> &cmds)
 			//if "&& ; " or "|| ;" was entered -- syntax error
 			if ((cmds.at(i) == "&&" || cmds.at(i) == "||") && cmds.at(i+1) == ";") return true;
 
-			//if ((i-1 > 0) && (cmds.at(i-1) == "<" || cmds.at(i-1) == ">" || cmds.at(i-1) == ">>" || cmds.at(i-1) == "|")) continue;
-			
-
-
-			//else, proceed to convert to char** and call execvp
+			//else, proceed to convert to char** for execvp
 			char** newargv = new char*[newvec.size()+1];
 			for (unsigned j = 0; j < newvec.size(); j++)
 			{
@@ -236,17 +251,21 @@ bool execcmds(const vector<string> &cmds)
 			}
 			newargv[newvec.size()] = '\0';
 
-			//if a redirection operator is found, move iterator i to after redir
-			/*
-			if (cmds.at(i) == "<") 
+			//if pipes are encountered, dup pipes
+			if (pcount > 0)
 			{
-				for(unsigned j = i; j < cmds.size(); j++)
-				{
-					if (cmds.at(j-1) == "<" || cmds.at(j-1) == ">" || cmds.at(j-1) == ">>" || cmds.at(j-1) == "|") temp = j;
-				}
+					if (-1 == dup2(pipe[0], 0))
+					{
+						perror("pipe read dup failed");
+						exit(1);
+					}
+					if (-1 == dup2(pipe[1], 1))
+					{
+						perror("pipe write dup failed");
+						exit(1);
+					}
 			}
-			*/
-
+				
 
 		  //cout << "execvp called on " << newargv[0] << endl;
 
@@ -256,8 +275,13 @@ bool execcmds(const vector<string> &cmds)
 			//if we're in the child
 			if (pid == 0)
 			{	
+				//handle piping
+				if (cmds.at(i) == "|")
+				{
+				} 
+
 				//handle input redirection
-				if (cmds.at(i) == "<")
+				else if (cmds.at(i) == "<")
 				{
 					++i;
 					in = open(cmds.at(i).c_str(), O_RDONLY);
@@ -267,12 +291,16 @@ bool execcmds(const vector<string> &cmds)
 						exit(1);
 					}
 
-					dup2(in, 0);
+					if (-1 == dup2(in, 0))
+					{
+						perror("dup failed");
+						exit(1);
+					}
 					++i;
 				} 
 
 				//handle output redirection
-				if (cmds.at(i) == ">")
+				else if (cmds.at(i) == ">")
 				{
 					++i;
 					out = open(cmds.at(i).c_str(), O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
@@ -281,10 +309,14 @@ bool execcmds(const vector<string> &cmds)
 						perror ("open out failed");
 						exit(1);
 					}
-					dup2(out, 1);
+					if (-1 == dup2(out, 1))
+					{
+						perror("dup failed");
+						exit(1);
+					}
 					//++i;
 				}
-				if (cmds.at(i) == ">>")
+				else if (cmds.at(i) == ">>")
 				{
 					++i;
 					out = open(cmds.at(i).c_str(), O_WRONLY|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
@@ -293,16 +325,24 @@ bool execcmds(const vector<string> &cmds)
 						perror ("open out failed");
 						exit(1);
 					}
-					dup2(out, 1);
+					if (-1 == dup2(out, 1))
+					{
+						perror("dup failed");
+						exit(1);
+					}
 					//++i;
 				}
+
+				//execute
 				execret = execvp(newargv[0], newargv);
+
+				//if an error happens, call perror, delete data, and exit
 				if (-1 == execret)
 				{	
 					perror(*newargv);
-					for (unsigned k=0; k < newvec.size(); k++)
+					for (unsigned k=0; k <= newvec.size(); k++)
 					{
-						delete[] newargv[i];
+						delete[] newargv[k];
 					}
 					delete[] newargv;
 					exit(1);
@@ -341,7 +381,7 @@ bool execcmds(const vector<string> &cmds)
 			if (newvec.size() > 0)
 			{
 				newvec.clear();
-				for (unsigned k=0; k < newvec.size(); k++)
+				for (unsigned k=0; k <= newvec.size(); k++)
 				{
 						delete[] newargv[k];
 				}
