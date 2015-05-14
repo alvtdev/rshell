@@ -14,6 +14,7 @@
 #include <sys/wait.h>
 #include <linux/limits.h>
 #include <fcntl.h>
+#include <errno.h>
 using namespace std;
 
 void printprompt()
@@ -211,6 +212,32 @@ bool execcmds(const vector<string> &cmds, int pcount)
 		perror("pipe");
 		exit(1); 
 	}
+	//backup stdin and stdout 
+	
+	int inbackup = dup(STDIN_FILENO);
+	if (-1 == inbackup)
+	{
+		perror("backup stdin failed");
+		exit(1);
+	}
+	int outbackup = dup(STDOUT_FILENO);
+	if (-1 == outbackup)
+	{
+		perror("backup stdout failed");
+		exit(1);
+	}
+	/*
+	if (-1 == close(0))
+	{
+		perror("close 0 failed");
+		exit(1);
+	}
+	if (-1 == close(1))
+	{
+		perror("close 1 failed");
+		exit(1);
+	}
+*/	
 
 
 	vector<string> newvec;
@@ -251,24 +278,6 @@ bool execcmds(const vector<string> &cmds, int pcount)
 			}
 			newargv[newvec.size()] = '\0';
 
-			//if pipes are encountered, dup pipes
-		/*	
-			if (pcount > 0)
-			{
-					if (-1 == dup2(pipe[0], 0))
-					{
-						perror("pipe read dup failed");
-						exit(1);
-					}
-					if (-1 == dup2(pipe[1], 1))
-					{
-						perror("pipe write dup failed");
-						exit(1);
-					}
-			}
-			*/
-				
-
 		  //cout << "execvp called on " << newargv[0] << endl;
 
 			int execret = 0; //keeps track of exec return value. init to 0
@@ -280,12 +289,13 @@ bool execcmds(const vector<string> &cmds, int pcount)
 				//handle piping
 				if (pcount > 0 && cmds.at(i) == "|")
 				{
-					if(-1 == close(1))
+					
+					if(-1 == close(pipefd[0]))
 					{
 						perror("child close failed");
 						exit(1);
 					}
-					if(-1 == dup(pipefd[1]))
+					if(-1 == dup2(pipefd[1], 1))
 					{
 						perror("child dup failed");
 						exit(1);
@@ -309,7 +319,24 @@ bool execcmds(const vector<string> &cmds, int pcount)
 						exit(1);
 					}
 					++i;
+
+					//handle piping
+					if (pcount > 0 && cmds.at(i) == "|")
+					{
+						
+						if(-1 == close(pipefd[0]))
+						{
+							perror("child close failed");
+							exit(1);
+						}
+						if(-1 == dup2(pipefd[1], 1))
+						{
+							perror("child dup failed");
+							exit(1);
+						}
+					} 
 				} 
+
 
 				//handle output redirection
 				else if (cmds.at(i) == ">")
@@ -345,6 +372,7 @@ bool execcmds(const vector<string> &cmds, int pcount)
 					//++i;
 				}
 
+
 				//execute
 				execret = execvp(newargv[0], newargv);
 
@@ -370,12 +398,12 @@ bool execcmds(const vector<string> &cmds, int pcount)
 				}
 				if (pcount > 0 && cmds.at(i) == "|")
 				{
-					if(-1 == close(0))
+					if(-1 == close(pipefd[1]))
 					{
 						perror("parent close failed");
 						exit(1);
 					}
-					if(-1 == dup(pipefd[0]))
+					if(-1 == dup2(pipefd[0], 0))
 					{
 						perror("parent dup failed");
 						exit(1);
@@ -401,6 +429,31 @@ bool execcmds(const vector<string> &cmds, int pcount)
 					exit(1);
 				}
 				out = -1;
+			}
+			//restore stdin and stdout if pipe commands done
+			if (pcount == 0)
+			{
+				if (-1 == dup2(inbackup, STDIN_FILENO))
+				{
+					perror("restore in failed");
+					exit(1);
+				}
+				
+				if (-1 == close(inbackup))
+				{
+					perror("close inbackup failed");
+					exit(1);
+				}
+				if (-1 == dup2(outbackup, STDOUT_FILENO))
+				{
+					perror("restore out failed");
+					exit(1);
+				}
+				if (-1 == close(outbackup))
+				{
+					perror("close outbackup failed");
+					exit(1);
+				}
 			}
 			//clear all memory
 			if (newvec.size() > 0)

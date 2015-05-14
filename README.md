@@ -12,13 +12,13 @@ It is essentially an unfinished, more limited version of Bash.
 * can also be terminated using ctrl+d.
 * prints a "Goodbye" message when terminated.
 * A syntax error message will be printed when one is detected. (e.g. ls &&&&&&& ; ||||)
+* somewhat supports piping (see bugs)
 
 ###Known bugs (Rshell)
 (that need to, and will, be fixed)
 * Any command entered that begins with a semicolon or forward slash causes an error. (e.g. ;ls)
 * Unable to run rshell within rshell; (bin/rshell gives a permission denied message)
-* Some memory leaks occur. 
-* bin/rshell returns a "permission denied" message (not entirely sure if this is a bug with rshell)
+* piping does work, but breaks cin and causes rshell to exit after use.
 
 ###Current features (ls)
 * parameters and flags are accepted in any arbitrary order.
