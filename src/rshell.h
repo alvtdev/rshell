@@ -345,7 +345,7 @@ bool execcmds(const vector<string> &cmds, int pcount)
 
 
 				//handle output redirection
-				else if (cmds.at(i) == ">")
+				if (cmds.at(i) == ">")
 				{
 					++i;
 					out = open(cmds.at(i).c_str(), O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
@@ -360,7 +360,7 @@ bool execcmds(const vector<string> &cmds, int pcount)
 						exit(1);
 					}
 				}
-				else if (cmds.at(i) == ">>")
+				if (cmds.at(i) == ">>")
 				{
 					++i;
 					out = open(cmds.at(i).c_str(), O_WRONLY|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
@@ -442,7 +442,7 @@ bool execcmds(const vector<string> &cmds, int pcount)
 				out = -1;
 			}
 				//restore stdin and stdout if pipe commands done
-				if (pcntbckup < 0)
+				if (pcntbckup < 0 && pcount > 0)
 				{
 					if (-1 == close(pipefd[0]))
 					{
