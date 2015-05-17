@@ -13,7 +13,7 @@ using namespace std;
 
 int main (int argc, char** argv)
 {
-	while (cin.good())
+	while (true)
 	{
 		printprompt();
 		string rawinput = getinput();

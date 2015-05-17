@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/stat.h> 
 #include <sys/wait.h>
+#include <limits.h>
 #include <linux/limits.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -38,12 +39,21 @@ string getinput()
 {
 	//string will store raw user input
 	string rawinput;
+	
+	if(cin.fail())
+	{
+	//freopen("/dev/stdin", "w", stdin);
+		cin.clear();
+		cin.ignore(INT_MAX, '\n');
+	}
 
 	//obtain user input commands
 	getline(cin, rawinput);
 
-	if (!cin.good())
+
+	if (cin.fail())
 	{
+		perror("cin is broken");
 		printf("\n");
 		exit(1);
 	}
@@ -202,47 +212,40 @@ int pipecount(const string parsedinput)
 
 bool execcmds(const vector<string> &cmds, int pcount)
 {
+	int pcntbckup = pcount;
 	//input and output file handles, set to -1 so it won't interfere with other file descriptors
 	int in = -1;
 	int out = -1;
 	//declare pipefd in case pipes exit
 	int pipefd[2];
-	if (pipe(pipefd) == -1)
-	{
-		perror("pipe");
-		exit(1); 
-	}
 	//backup stdin and stdout 
 	
-	int inbackup = dup(STDIN_FILENO);
+	int inbackup = dup(0);
 	if (-1 == inbackup)
 	{
 		perror("backup stdin failed");
 		exit(1);
 	}
-	int outbackup = dup(STDOUT_FILENO);
+	int outbackup = dup(1);
 	if (-1 == outbackup)
 	{
 		perror("backup stdout failed");
 		exit(1);
 	}
-	/*
-	if (-1 == close(0))
-	{
-		perror("close 0 failed");
-		exit(1);
-	}
-	if (-1 == close(1))
-	{
-		perror("close 1 failed");
-		exit(1);
-	}
-*/	
 
 
 	vector<string> newvec;
 	for (unsigned i = 0; i < cmds.size(); i++)
 	{
+		//create pipe if pipes found
+		if ((pcntbckup - pcount) ==  0)
+		{
+			if (pipe(pipefd) == -1)
+			{
+				perror("pipe");
+				exit(1); 
+			}
+		}
 		//temp is the position of the argument after a redireection operator is found
 		unsigned temp = i;
 
@@ -256,7 +259,7 @@ bool execcmds(const vector<string> &cmds, int pcount)
 			//temp int keeping track of where i should be after loop
 			temp = i+1;
 
-			//check for output redirect
+			//check for output redirectjjk
 			//if complementary output redirection, temp+=2
 			if (cmds.at(temp+1) == ">" || cmds.at(temp+1) == ">>") temp+=2;
 		}
@@ -278,6 +281,7 @@ bool execcmds(const vector<string> &cmds, int pcount)
 			}
 			newargv[newvec.size()] = '\0';
 
+
 		  //cout << "execvp called on " << newargv[0] << endl;
 
 			int execret = 0; //keeps track of exec return value. init to 0
@@ -290,7 +294,7 @@ bool execcmds(const vector<string> &cmds, int pcount)
 				if (pcount > 0 && cmds.at(i) == "|")
 				{
 					
-					if(-1 == close(pipefd[0]))
+					if(-1 == close(1))
 					{
 						perror("child close failed");
 						exit(1);
@@ -319,16 +323,10 @@ bool execcmds(const vector<string> &cmds, int pcount)
 						exit(1);
 					}
 					++i;
-
 					//handle piping
 					if (pcount > 0 && cmds.at(i) == "|")
 					{
 						
-						if(-1 == close(pipefd[0]))
-						{
-							perror("child close failed");
-							exit(1);
-						}
 						if(-1 == dup2(pipefd[1], 1))
 						{
 							perror("child dup failed");
@@ -387,28 +385,59 @@ bool execcmds(const vector<string> &cmds, int pcount)
 					delete[] newargv;
 					exit(1);
 				}
+
 			}
-			//if we're in the parent
-			else 
+			else
 			{
-				if (-1 == wait(0)) 
-				{
-					perror("wait");
-					exit(1);
-				}
+				//if not the last pipe, only close write end
 				if (pcount > 0 && cmds.at(i) == "|")
 				{
-					if(-1 == close(pipefd[1]))
+					if (-1 == close(0))
 					{
-						perror("parent close failed");
+						perror ("close 0 failed");
 						exit(1);
 					}
-					if(-1 == dup2(pipefd[0], 0))
+					if(-1 == dup(pipefd[0]))
 					{
 						perror("parent dup failed");
 						exit(1);
 					}
 				} 
+				//restore stdin and stdout if pipe commands done
+				if (pcntbckup > 0 && pcount == 0)
+				{
+					if (-1 == close(pipefd[0]))
+					{
+						perror("parent close failed");
+						exit(1);
+					}
+					if(-1 == close(pipefd[1]))
+					{
+						perror("parent close failed");
+						exit(1);
+					}
+					if (-1 == dup2(inbackup, 0))
+					{
+						perror("restore in failed");
+						exit(1);
+					}
+					
+					if (-1 == dup2(outbackup, 1))
+					{
+						perror("restore out failed");
+						exit(1);
+					}
+					if (-1 == close(outbackup))
+					{
+						perror("close outbackup failed");
+						exit(1);
+					}
+				}
+				if (-1 == wait(NULL)) 
+				{
+					perror("wait");
+					exit(1);
+				}
 			}
 			//close in
 			if (in != -1)
@@ -429,31 +458,6 @@ bool execcmds(const vector<string> &cmds, int pcount)
 					exit(1);
 				}
 				out = -1;
-			}
-			//restore stdin and stdout if pipe commands done
-			if (pcount == 0)
-			{
-				if (-1 == dup2(inbackup, STDIN_FILENO))
-				{
-					perror("restore in failed");
-					exit(1);
-				}
-				
-				if (-1 == close(inbackup))
-				{
-					perror("close inbackup failed");
-					exit(1);
-				}
-				if (-1 == dup2(outbackup, STDOUT_FILENO))
-				{
-					perror("restore out failed");
-					exit(1);
-				}
-				if (-1 == close(outbackup))
-				{
-					perror("close outbackup failed");
-					exit(1);
-				}
 			}
 			//clear all memory
 			if (newvec.size() > 0)
