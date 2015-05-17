@@ -274,6 +274,8 @@ bool execcmds(const vector<string> &cmds, int pcount)
 			//if "&& ; " or "|| ;" was entered -- syntax error
 			if ((cmds.at(i) == "&&" || cmds.at(i) == "||") && cmds.at(i+1) == ";") return true;
 
+			if (cmds.at(i) == "<" && cmds.at(i+2) == "|") continue;
+
 			//else, proceed to convert to char** for execvp
 			char** newargv = new char*[newvec.size()+1];
 			for (unsigned j = 0; j < newvec.size(); j++)
@@ -282,6 +284,7 @@ bool execcmds(const vector<string> &cmds, int pcount)
 				strcpy(newargv[j], newvec.at(j).c_str());
 				//cout << newvec.at(j) << " added." << endl;
 			}
+			
 			newargv[newvec.size()] = '\0';
 
 
@@ -296,7 +299,6 @@ bool execcmds(const vector<string> &cmds, int pcount)
 				//handle piping
 				if (pcntbckup - pcount == 0 && cmds.at(i) == "|")
 				{
-					
 					if(-1 == close(pipefd[0]))
 					{
 						perror("child close failed");
@@ -319,22 +321,23 @@ bool execcmds(const vector<string> &cmds, int pcount)
 						perror("open in failed");
 						exit(1);
 					}
-
 					if (-1 == dup2(in, 0))
 					{
 						perror("dup failed");
 						exit(1);
 					}
+
 					++i;
 					//handle piping
-					if (pcntbckup - pcount == 0 && cmds.at(i) == "|")
+					if (cmds.at(i) == "|")
 					{
-						if(-1 == close(pipefd[0]))
+						/*
+						if(-1 == dup2(in, pipefd[1]))
 						{
-							perror("child close failed");
+							perror("child dup 1 failed");
 							exit(1);
 						}
-						
+						*/
 						if(-1 == dup2(pipefd[1], 1))
 						{
 							perror("child dup failed");
