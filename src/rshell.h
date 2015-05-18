@@ -53,8 +53,8 @@ string getinput()
 
 	if (cin.fail())
 	{
-		perror("cin is broken");
-		printf("\n");
+		//perror("cin is broken");
+		printf("\nGoodbye\n");
 		exit(1);
 	}
 
@@ -81,8 +81,21 @@ string parseinput(string rawinput)
 
 
 	//first remove leading whitespaces at the very beginning of the string
-	while (parsedinput.at(wspos) == ' ') wspos++;
+	for (unsigned i=0; i<parsedinput.size();i++)
+	{
+		if(parsedinput.at(i) == ' ') wspos++;
+		else break;
+	}
 	parsedinput = parsedinput.substr(wspos, parsedinput.size());
+
+	//check again for exit
+	if (parsedinput.substr(0,4) == "exit") 
+	{
+		//killrshell = true;
+		printf("Goodbye.\n");
+		exit(0);
+	}
+
 	//then reinit wsend for removing inner whitespaces
 	wspos = 0;
 
