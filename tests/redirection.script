@@ -1,0 +1,112 @@
+Script started on Sun 17 May 2015 05:25:15 PM PDT
+~/rshell
+athai005@hammer $ bin/rshell
+athai005@hammer.cs.ucr.edu $ #oi  io redir symbols at beginning/end trested      ated as errors
+athai005@hammer.cs.ucr.edu $ >
+Syntax error.
+athai005@hammer.cs.ucr.edu $ <
+Syntax error.
+athai005@hammer.cs.ucr.edu $ >>
+Syntax error.
+athai005@hammer.cs.ucr.edu $ |
+Syntax error.
+athai005@hammer.cs.ucr.edu $ cat|  |
+Syntax error.
+athai005@hammer.cs.ucr.edu $ cat >
+Syntax error.
+athai005@hammer.cs.ucr.edu $ cat < 
+Syntax error.
+athai005@hammer.cs.ucr.edu $ cat >>
+Syntax error.
+athai005@hammer.cs.ucr.edu $ #test output redirection
+athai005@hammer.cs.ucr.edu $ cat > test
+chips are fries
+athai005@hammer.cs.ucr.edu $ cat > test2 ( 
+crisps are chips
+athai005@hammer.cs.ucr.edu $ cat test; cat test2
+chips are fries
+crisps are chips
+athai005@hammer.cs.ucr.edu $ #overwrite/append
+athai005@hammer.cs.ucr.edu $ car t > test
+chips are not friend    ench fris es
+athai005@hammer.cs.ucr.edu $ cat test
+chips are not french fries
+athai005@hammer.cs.ucr.edu $ cat >> test2
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ cat test2
+crisps are chips
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ #'>>' also creates the file if file doesn't already exit st
+athai005@hammer.cs.ucr.edu $ ls
+1  bin	cat  LICENSE  Makefile	outfile  README.md  README.md~	src  test  test2  test3  testall  tests
+athai005@hammer.cs.ucr.edu $ cat test1 >> testoutfile
+cat: test1: No such file or directory
+athai005@hammer.cs.ucr.edu $ #oops. meant to just type test instead of test1
+athai005@hammer.cs.ucr.edu $ cat test >> testoutfile
+athai005@hammer.cs.ucr.edu $ ls
+1  bin	cat  LICENSE  Makefile	outfile  README.md  README.md~	src  test  test2  test3  testall  testoutfile  tests
+athai005@hammer.cs.ucr.edu $ cat testoutfile
+chips are not french fries
+athai005@hammer.cs.ucr.edu $ #test input redirection
+athai005@hammer.cs.ucr.edu $ cat < test1
+open in failed: No such file or directory
+athai005@hammer.cs.ucr.edu $ cat < test
+chips are not french fries
+athai005@hammer.cs.ucr.edu $ cat  <test2
+crisps are chips
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ cat       <            test3
+chips are not french fries
+athai005@hammer.cs.ucr.edu $ #chain input and output
+athai005@hammer.cs.ucr.edu $ cat < test3 > testall
+athai005@hammer.cs.ucr.edu $ cat testall  
+chips are not french fries
+athai005@hammer.cs.ucr.edu $ cat < test2 >> testall
+athai005@hammer.cs.ucr.edu $ cat <<  testall
+chips are not french fries
+crisps are chips
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ #test piping by itself
+athai005@hammer.cs.ucr.edu $ cat testall |   frep    grep chips
+chips are not french fries
+crisps are chips
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ cat testall | grep crissp  ps
+crisps are chips
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ cat testall | grep america
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ #test ti  piping with input redirection
+athai005@hammer.cs.ucr.edu $ cat < testall | frep    grep chips
+chips are not french fries
+crisps are chips
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ cat < testall | grep crisps
+crisps are chips
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ cat < testall | grep america
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ #test piping with input and output redirection
+athai005@hammer.cs.ucr.edu $ cat < testall | grep America > outfile
+athai005@hammer.cs.ucr.edu $ ls
+1  bin	cat  LICENSE  Makefile	outfile  README.md  README.md~	src  test  test2  test3  testall  testoutfile  tests
+athai005@hammer.cs.ucr.edu $ cayt  t outfile
+athai005@hammer.cs.ucr.edu $ cat < testall | grep chips > outfile
+athai005@hammer.cs.ucr.edu $ cat outfile
+chips are not french fries
+crisps are chips
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ cat < testall | frep      grep america > outfile
+athai005@hammer.cs.ucr.edu $ cat outfile
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ cat testall | greo   p uk >> outfile
+athai005@hammer.cs.ucr.edu $ cat outfile  
+chips in america are crisps in the uk
+chips in america are crisps in the uk
+athai005@hammer.cs.ucr.edu $ # unfot rtunately, multiple pipes don't work, but ths is will be updated when i get them working.  
+athai005@hammer.cs.ucr.edu $ exit
+Goodbye.
+~/rshell
+athai005@hammer $ exit
+
+Script done on Sun 17 May 2015 05:32:38 PM PDT

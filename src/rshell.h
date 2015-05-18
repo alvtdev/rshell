@@ -366,13 +366,12 @@ bool execcmds(const vector<string> &cmds, int pcount)
 				if (cmds.at(i) == ">>")
 				{
 					++i;
-					out = open(cmds.at(i).c_str(), O_WRONLY|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
+					out = open(cmds.at(i).c_str(), O_WRONLY|O_APPEND|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
 					if (out == -1)
 					{
-						perror ("open out failed");
-						exit(1);
+						perror ("ERROR");
 					}
-					if (-1 == dup2(out, 1))
+					if ( out != -1 && -1 == dup2(out, 1))
 					{
 						perror("dup failed");
 						exit(1);
