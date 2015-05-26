@@ -179,7 +179,7 @@ bool makecmds(const string parsedinput, vector<string> &cmds)
 					continue;
 				}
 			}
-			else if (parsedinput.at(i) == '|')
+			else if (parsedinput.at(i) == '|' && parsedinput.at(i+1) != '|')
 			{
 				cmds.push_back("|");
 				continue;
@@ -220,7 +220,11 @@ int pipecount(const string parsedinput)
 	int temp = 0;
 	for (unsigned i=0; i < parsedinput.size(); i++)
 	{
-		if (parsedinput.at(i)=='|') temp++;
+		if (parsedinput.at(i)=='|')
+		{
+			if (parsedinput.at(i+1) != '|') temp++;
+			else if (parsedinput.at(i+1) == '|') i++;
+		}
 	}
 	return temp;
 }

@@ -23,7 +23,14 @@ int main (int argc, char** argv)
 			string parsedinput = parseinput(rawinput);		
 			//bool will store syntax error
 			bool synerror = makecmds(parsedinput, cmds);
+			/*
+			for (unsigned i =0; i<cmds.size(); i++)
+			{
+				cout << i << " " << cmds.at(i) << endl;
+			}
+			*/
 			int pcount = pipecount(parsedinput);		
+			//cout << "pcount = " << pcount << endl;
 			if (synerror != true)	synerror = execcmds(cmds, pcount);
 			if (synerror == true)	printf("Syntax error.\n");
 		}
