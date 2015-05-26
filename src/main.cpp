@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <linux/limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -15,7 +16,15 @@ int main (int argc, char** argv)
 {
 	while (true)
 	{
-		printprompt();
+		//get current directory
+		char currdir[BUFSIZ];
+		getcwd(currdir, PATH_MAX); 	
+		if (currdir == NULL)
+		{
+			perror ("getcwd failed");
+			exit(1);
+		}
+		printprompt(currdir);
 		string rawinput = getinput();
 		vector<string> cmds;
 		if (!rawinput.empty())

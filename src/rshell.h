@@ -18,7 +18,7 @@
 #include <errno.h>
 using namespace std;
 
-void printprompt()
+void printprompt(char *x)
 {
 	//obtain login and hostname
 	char* login = getlogin();
@@ -31,8 +31,10 @@ void printprompt()
 	printf("%s", "@");
 	printf("%s ", hostname);
 
+	printf(x);
+
 	//simple command prompt print
-	printf("%s", "$ ");
+	printf(" %s", "$ ");
 }
 
 string getinput()
@@ -121,7 +123,7 @@ string parseinput(string rawinput)
 bool makecmds(const string parsedinput, vector<string> &cmds)
 {
 	//initial scan for syntax errors
-	if (!isalpha(parsedinput.at(0))) return true;
+	if (!isalpha(parsedinput.at(0)) && parsedinput.at(0) != '.') return true;
 
 	bool seploopdone = false;
 	//iterate through string and separate into commands and connectors
