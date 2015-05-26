@@ -27,14 +27,23 @@ void printprompt(char *x)
 	char hostname[256];
 	if (-1 == gethostname(hostname, 256)) perror("hostname");
 
+	//print green for login and host
+	printf("\033[32m");
 	printf("%s", login);
 	printf("%s", "@");
 	printf("%s ", hostname);
+	//reset color
+	printf("\033[0m");
 
+	//print yellow for current directory
+	printf("\033[33m");
 	printf(x);
+	printf("\033[0m");
 
 	//simple command prompt print
+	printf("\033[36m");
 	printf(" %s", "$ ");
+	printf("\033[0m");
 }
 
 string getinput()
@@ -194,7 +203,8 @@ bool makecmds(const string parsedinput, vector<string> &cmds)
 			else if (parsedinput.at(i) != ' ')
 			{
 				parsecmd += parsedinput.at(i);
-				if ((!isalpha(parsedinput.at(i+1)) && !isdigit(parsedinput.at(i+1))) && parsedinput.at(i+1) != '.')
+				//cout << "parsecmd = " << parsecmd << endl;
+				if ((!isalpha(parsedinput.at(i+1)) && !isdigit(parsedinput.at(i+1))) && parsedinput.at(i+1) != '.' && parsedinput.at(i+1) != '/')
 				{
 					cmds.push_back(parsecmd);
 					parsecmd.clear();
