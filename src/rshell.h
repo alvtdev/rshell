@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include <stdlib.h>
 #include <string>
 #include <vector>
 #include <stdio.h>
@@ -16,9 +17,11 @@
 #include <linux/limits.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <vector>
 using namespace std;
 
-void printprompt(char *x)
+
+void printprompt()
 {
 	//obtain login and hostname
 	char* login = getlogin();
@@ -26,6 +29,14 @@ void printprompt(char *x)
 
 	char hostname[256];
 	if (-1 == gethostname(hostname, 256)) perror("hostname");
+
+	char currdir[BUFSIZ];
+	getcwd(currdir, PATH_MAX);
+	if (currdir == NULL)
+	{
+		perror("getcwd failed");
+		exit(1);
+	}
 
 	//print green for login and host
 	printf("\033[32m");
@@ -37,7 +48,7 @@ void printprompt(char *x)
 
 	//print yellow for current directory
 	printf("\033[33m");
-	printf(x);
+	printf(currdir);
 	printf("\033[0m");
 
 	//simple command prompt print
@@ -57,7 +68,7 @@ string getinput()
 		cin.clear();
 		cin.ignore(INT_MAX, '\n');
 	}
-
+	cin.clear();
 	//obtain user input commands
 	getline(cin, rawinput);
 
@@ -241,7 +252,90 @@ int pipecount(const string parsedinput)
 	return temp;
 }
 
-bool execcmds(const vector<string> &cmds, int pcount)
+vector<string> getpaths()
+{
+	vector<string> paths;
+	string path = (getenv("PATH"));
+	if (path.size() == 0) return paths;
+	else 
+	{
+		int begin = 0;
+		for (unsigned i=0; i < path.size(); i++)
+		{
+			if (path.at(i) == ':')
+			{
+				string temp = path.substr(begin, i-begin);
+				paths.push_back(temp);
+				begin = i+1;
+			}
+		}
+	}
+	return paths;
+}
+
+void execcd(char **newargv, vector<string> paths)
+{
+	char currdir[BUFSIZ];
+	getcwd(currdir, PATH_MAX);
+	if (currdir == NULL)
+	{
+		perror("get current directory failed");
+		exit(1);
+	}
+	if (newargv[1] == NULL)
+	{
+		if (-1 == setenv("OLDPWD", currdir, 1))
+		{
+			perror("set OLDPWD after cd failed");
+			exit(1);
+		}
+		if (-1 == chdir(getenv("HOME")))
+		{
+			perror("chdir to home failed");
+			exit(1);
+		}
+		if (-1 == setenv("PWD", newargv[1], 1))
+		{
+			perror("set PWD after cd failed");
+			exit(1);
+		}
+	}
+	else if (strcmp(newargv[1], "-") == 0)
+	{
+		string prevpath = getenv("OLDPWD");
+		cout << "prevpath = " << prevpath << endl;
+		if (-1 == setenv("OLDPWD", currdir, 1))
+		{
+			perror("set OLDPWD after cd failed");
+			exit(1);
+		}
+		if (-1 == chdir(prevpath.c_str())) 
+		{
+			perror("chdir to previous failed");
+		}
+	}
+	else
+	{
+		//newargv[0] wil be "cd", just ignore it.
+		if (-1 == setenv("OLDPWD", currdir, 1))
+		{
+			perror("set OLDPWD after cd failed");
+			exit(1);
+		}
+		if (-1 == chdir(newargv[1]))
+		{
+			perror("chdir failed");
+		}
+		if (-1 == setenv("PWD", newargv[1], 1))
+		{
+			perror("set PWD after cd failed");
+			exit(1);
+		}
+	}
+	
+}
+
+bool execcmds(const vector<string> &cmds, int pcount, vector<string> paths)
 {
 	int pcntbckup = pcount;
 	//input and output file handles, set to -1 so it won't interfere with other file descriptors
@@ -316,162 +410,179 @@ bool execcmds(const vector<string> &cmds, int pcount)
 			
 			newargv[newvec.size()] = '\0';
 
-
-		  //cout << "execvp called on " << newargv[0] << endl;
-
-			int execret = 0; //keeps track of exec return value. init to 0
-			int pid = fork();
-			if (pid == -1) perror("fork");
-			//if we're in the child
-			if (pid == 0)
-			{	
-				//handle piping
-				if (pcntbckup - pcount == 0 && cmds.at(i) == "|")
+			if (strcmp(newargv[0], (char*)"cd") == 0)
+			{
+				execcd(newargv, paths);
+				//clear all memory
+				if (newvec.size() > 0)
 				{
-					if(-1 == close(pipefd[0]))
+					newvec.clear();
+					for (unsigned k=0; k <= newvec.size(); k++)
 					{
-						perror("child close failed");
-						exit(1);
+							delete[] newargv[k];
 					}
-					if(-1 == dup2(pipefd[1], 1))
-					{
-						perror("child dup failed");
-						exit(1);
-					}
-				} 
+					delete[] newargv;
+				}
+			}
 
-				//handle input redirection
-				else if (cmds.at(i) == "<")
-				{
-					++i;
-					in = open(cmds.at(i).c_str(), O_RDONLY);
-					if (in == -1)
-					{
-						perror("open in failed");
-						exit(1);
-					}
-					if (-1 == dup2(in, 0))
-					{
-						perror("dup failed");
-						exit(1);
-					}
-
-					++i;
+			else
+			{
+				int execret = 0; //keeps track of exec return value. init to 0
+				int pid = fork();
+				if (pid == -1) perror("fork");
+				//if we're in the child
+				if (pid == 0)
+				{	
 					//handle piping
-					if (cmds.at(i) == "|")
+					if (pcntbckup - pcount == 0 && cmds.at(i) == "|")
 					{
-						/*
-						if(-1 == dup2(in, pipefd[1]))
+						if(-1 == close(pipefd[0]))
 						{
-							perror("child dup 1 failed");
+							perror("child close failed");
 							exit(1);
 						}
-						*/
 						if(-1 == dup2(pipefd[1], 1))
 						{
 							perror("child dup failed");
 							exit(1);
 						}
 					} 
-				} 
+
+					//handle input redirection
+					else if (cmds.at(i) == "<")
+					{
+						++i;
+						in = open(cmds.at(i).c_str(), O_RDONLY);
+						if (in == -1)
+						{
+							perror("open in failed");
+							exit(1);
+						}
+						if (-1 == dup2(in, 0))
+						{
+							perror("dup failed");
+							exit(1);
+						}
+
+						++i;
+						//handle piping
+						if (cmds.at(i) == "|")
+						{
+							/*
+							if(-1 == dup2(in, pipefd[1]))
+							{
+								perror("child dup 1 failed");
+								exit(1);
+							}
+							*/
+							if(-1 == dup2(pipefd[1], 1))
+							{
+								perror("child dup failed");
+								exit(1);
+							}
+						} 
+					} 
 
 
-				//handle output redirection
-				if (cmds.at(i) == ">")
-				{
-					++i;
-					out = open(cmds.at(i).c_str(), O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
-					if (out == -1)
+					//handle output redirection
+					if (cmds.at(i) == ">")
 					{
-						perror ("open out failed");
-						exit(1);
+						++i;
+						out = open(cmds.at(i).c_str(), O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
+						if (out == -1)
+						{
+							perror ("open out failed");
+							exit(1);
+						}
+						if (-1 == dup2(out, 1))
+						{
+							perror("dup failed");
+							exit(1);
+						}
 					}
-					if (-1 == dup2(out, 1))
+					if (cmds.at(i) == ">>")
 					{
-						perror("dup failed");
-						exit(1);
+						++i;
+						out = open(cmds.at(i).c_str(), O_WRONLY|O_APPEND|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
+						if (out == -1)
+						{
+							perror ("ERROR");
+						}
+						if ( out != -1 && -1 == dup2(out, 1))
+						{
+							perror("dup failed");
+							exit(1);
+						}
 					}
-				}
-				if (cmds.at(i) == ">>")
-				{
-					++i;
-					out = open(cmds.at(i).c_str(), O_WRONLY|O_APPEND|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
-					if (out == -1)
-					{
-						perror ("ERROR");
-					}
-					if ( out != -1 && -1 == dup2(out, 1))
-					{
-						perror("dup failed");
-						exit(1);
-					}
-				}
 
 
-				//execute
-				execret = execvp(newargv[0], newargv);
+					//execute
+					else 
+					{
+						execret = execvp(newargv[0], newargv);
+					}
 
-				//if an error happens, call perror, delete data, and exit
-				if (-1 == execret)
-				{	
-					perror(*newargv);
-					for (unsigned k=0; k <= newvec.size(); k++)
-					{
-						delete[] newargv[k];
+					//if an error happens, call perror, delete data, and exit
+					if (-1 == execret)
+					{	
+						perror(*newargv);
+						for (unsigned k=0; k <= newvec.size(); k++)
+						{
+							delete[] newargv[k];
+						}
+						delete[] newargv;
+						exit(1);
 					}
-					delete[] newargv;
-					exit(1);
-				}
 
-			}
-			else
-			{
-				if (-1 == wait(0)) 
-				{
-					perror("wait");
-					exit(1);
 				}
-				pcntbckup--;
-				//if not the last pipe, only close write end
-				if (pcntbckup >= 0)
+				else
 				{
-					if (-1 == close(pipefd[1]))
+					if (-1 == wait(0)) 
 					{
-						perror("parent close pipe 1 failed");
+						perror("wait");
 						exit(1);
 					}
-					if (-1 == close(0))
+					pcntbckup--;
+					//if not the last pipe, only close write end
+					if (pcntbckup >= 0)
 					{
-						perror ("close 0 failed");
+						if (-1 == close(pipefd[1]))
+						{
+							perror("parent close pipe 1 failed");
+							exit(1);
+						}
+						if (-1 == close(0))
+						{
+							perror ("close 0 failed");
+							exit(1);
+						}
+						if(-1 == dup(pipefd[0]))
+						{
+							perror("parent dup failed");
+							exit(1);
+						}
+					} 
+				}
+				//close in
+				if (in != -1)
+				{
+					if (-1 == close(in))
+					{
+						perror("close in failed"); 
 						exit(1);
 					}
-					if(-1 == dup(pipefd[0]))
+					in = -1;
+				}
+				//close out
+				if (out != -1)
+				{
+					if (-1 == close(out))
 					{
-						perror("parent dup failed");
+						perror("close out failed");
 						exit(1);
 					}
-				} 
-			}
-			//close in
-			if (in != -1)
-			{
-				if (-1 == close(in))
-				{
-					perror("close in failed"); 
-					exit(1);
+					out = -1;
 				}
-				in = -1;
-			}
-			//close out
-			if (out != -1)
-			{
-				if (-1 == close(out))
-				{
-					perror("close out failed");
-					exit(1);
-				}
-				out = -1;
-			}
 				//restore stdin and stdout if pipe commands done
 				if (pcntbckup < 0 && pcount > 0)
 				{
@@ -510,20 +621,22 @@ bool execcmds(const vector<string> &cmds, int pcount)
 						exit(1);
 					}
 				}
-			//clear all memory
-			if (newvec.size() > 0)
-			{
-				newvec.clear();
-				for (unsigned k=0; k <= newvec.size(); k++)
+				//clear all memory
+				if (newvec.size() > 0)
 				{
-						delete[] newargv[k];
+					newvec.clear();
+					for (unsigned k=0; k <= newvec.size(); k++)
+					{
+							delete[] newargv[k];
+					}
+					delete[] newargv;
 				}
-				delete[] newargv;
+				if (cmds.at(i) == "&&" && cmds.at(i-1) == "false") return false;
+				if (cmds.at(i) == "||" && execret == 0 && cmds.at(i-1) != "false") return false; 
+				if (cmds.at(i) == ";" && i == cmds.size()-1) return false;
+				if (temp > i) i = temp;
 			}
-			if (cmds.at(i) == "&&" && cmds.at(i-1) == "false") return false;
-			if (cmds.at(i) == "||" && execret == 0 && cmds.at(i-1) != "false") return false; 
-			if (cmds.at(i) == ";" && i == cmds.size()-1) return false;
-			if (temp > i) i = temp;
+
 //			cout << "new i = " << i << ", " << cmds.at(i) << endl;
 			if (i==cmds.size()-2) return false;
 		}
@@ -541,4 +654,31 @@ bool execcmds(const vector<string> &cmds, int pcount)
 	return false;
 }
 
+bool findcd(vector<string> cmds)
+{
+	for (unsigned i=0; i < cmds.size(); i++)
+	{
+		if (cmds.at(i) == "cd")
+		{
+			return true;
+		} 
+	}
+
+	return false;
+}
+
+
+
+
+/*
+void handle(int x)
+{
+	if (x == SIGINT)
+	{
+		fprintf(stdout, "\n");
+		printprompt();
+		cin.clear();
+	}
+}
+*/
 #endif
