@@ -10,29 +10,30 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
 #include "rshell.h"
 #include <pwd.h>
 using namespace std;
 
 int main (int argc, char** argv)
 {
-	/*
-	if (signal(SIGINT, handle) == SIG_ERR)
+	currstate.sa_handler = handle;
+	if (-1 == sigaction(SIGINT, &currstate, NULL))
 	{
-		perror("SIGINT handle failed");
+		perror("sigaction-SIGINT failed");
 		exit(1);
 	}
-	if (signal(SIGTSTP, handle) == SIG_ERR)
+	if (-1 == sigaction(SIGTSTP, &currstate, NULL))
 	{
-		perror("SIGTSTP handle failed");
+		perror("sigaction-SIGTSTP failed");
 		exit(1);
 	}
-	*/
+	
+	cout << "Welcome to Rshell!" << endl;
 
-	char olddir[BUFSIZ];
-	char currdir[BUFSIZ];
 	while (true)
 	{
+		signalfound = false;
 		vector<string> paths = getpaths();
 		/*
 		for (unsigned i=0; i < paths.size(); i++)
@@ -51,30 +52,10 @@ int main (int argc, char** argv)
 				exit(1);
 			}
 		}
-		//get current directory
-		getcwd(currdir, PATH_MAX); 	
-		if (currdir == NULL)
-		{
-			perror ("getcwd failed");
-			exit(1);
-		}
-		if (olddir == NULL)
-		{
-			strcpy(olddir, currdir);
-		}
-		if (-1 == setenv("PWD", currdir, 1))
-		{
-			perror("setenv failed");
-			exit(1);
-		}
-		if (-1 == setenv("OLDPWD", olddir, 1))
-		{
-			perror("setenv oldpwd failed");
-			exit(1);
-		}
-		
 		printprompt();
-		string rawinput = getinput();
+		string rawinput; 
+		getinput(rawinput);
+		if (signalfound == true) continue;
 		vector<string> cmds;
 		if (!rawinput.empty())
 		{
@@ -88,8 +69,8 @@ int main (int argc, char** argv)
 			}
 			*/
 			int pcount = pipecount(parsedinput);		
-			bool cdfound = findcd(cmds);
-			cout << "cdfound = " << cdfound << endl;
+//			bool cdfound = findcd(cmds);
+//			cout << "cdfound = " << cdfound << endl;
 			//bool cdfound = cdcheck(cmds);
 			//cout << "pcount = " << pcount << endl;
 			if (synerror != true)	synerror = execcmds(cmds, pcount, paths);

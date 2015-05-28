@@ -11,13 +11,14 @@ It is essentially an unfinished, more limited version of Bash.
 * handles "exit".
 * can also be terminated using ctrl+d.
 * prints a "Goodbye" message when terminated.
+* ^C does not terminate Rshell.
+* ^Z does not background Rshell.
 * A syntax error message will be printed when one is detected. (e.g. ls &&&&&&& ; ||||)
 * i/o redirection symbols and piping symbols entered as the first or last character of the input will be treated as syntax errors.
 * somewhat supports piping (see bugs)
 
 ###Known bugs (Rshell)
 * Any command entered that begins with a semicolon or forward slash causes an error. (e.g. ;ls)
-* Unable to run rshell within rshell; (bin/rshell gives a permission denied message)
 * piping does work, but cannot be chained with multiple pipes. (it does, however support piping with i/o redirection)
 
 ###Current features (ls)

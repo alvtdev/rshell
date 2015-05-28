@@ -20,6 +20,9 @@
 #include <vector>
 using namespace std;
 
+bool signalfound = false;
+struct sigaction currstate;
+struct sigaction prevstate;
 
 void printprompt()
 {
@@ -57,23 +60,19 @@ void printprompt()
 	printf("\033[0m");
 }
 
-string getinput()
+void getinput(string &rawinput)
 {
-	//string will store raw user input
-	string rawinput;
-	
 	if(cin.fail())
 	{
 	//freopen("/dev/stdin", "w", stdin);
 		cin.clear();
-		cin.ignore(INT_MAX, '\n');
+//		cin.ignore(INT_MAX, '\n');
 	}
-	cin.clear();
 	//obtain user input commands
 	getline(cin, rawinput);
+		
 
-
-	if (cin.fail())
+	if (cin.fail() && signalfound == false)
 	{
 		//perror("cin is broken");
 		printf("\nGoodbye\n");
@@ -92,7 +91,7 @@ string getinput()
 	//removes everything after '#'
 	if (rawinput.find('#') != string::npos) rawinput = rawinput.substr(0, rawinput.find('#'));
 
-	return rawinput;
+	return;
 }
 
 string parseinput(string rawinput)
@@ -303,7 +302,6 @@ void execcd(char **newargv, vector<string> paths)
 	else if (strcmp(newargv[1], "-") == 0)
 	{
 		string prevpath = getenv("OLDPWD");
-		cout << "prevpath = " << prevpath << endl;
 		if (-1 == setenv("OLDPWD", currdir, 1))
 		{
 			perror("set OLDPWD after cd failed");
@@ -312,6 +310,11 @@ void execcd(char **newargv, vector<string> paths)
 		if (-1 == chdir(prevpath.c_str())) 
 		{
 			perror("chdir to previous failed");
+		}
+		if (-1 == setenv("PWD", newargv[1], 1))
+		{
+			perror("set PWD after cd failed");
+			exit(1);
 		}
 	}
 	else
@@ -539,7 +542,7 @@ bool execcmds(const vector<string> &cmds, int pcount, vector<string> paths)
 				{
 					if (-1 == wait(0)) 
 					{
-						perror("wait");
+						perror("wait failed");
 						exit(1);
 					}
 					pcntbckup--;
@@ -667,18 +670,19 @@ bool findcd(vector<string> cmds)
 	return false;
 }
 
-
-
-
-/*
 void handle(int x)
 {
-	if (x == SIGINT)
+	signalfound = true;
+	switch(x)
 	{
-		fprintf(stdout, "\n");
-		printprompt();
-		cin.clear();
-	}
+		case SIGINT:
+			cout << endl;
+			break;
+		case SIGTSTP:
+			cout << endl;
+			break;
+		default:
+			break;
+	} 
 }
-*/
 #endif

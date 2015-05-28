@@ -1,5 +1,5 @@
 COMP = g++
-COMPFLAGS = -ansi -pedantic -Wall -Werror
+COMPFLAGS = -ansi -pedantic -Wall -Werror --std=c++11
 
 all: rshell ls cp
 
