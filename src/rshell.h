@@ -337,6 +337,25 @@ void execcd(char **newargv, vector<string> paths)
 	
 }
 
+void execfg(char **newargv, vector<string> paths)
+{
+	if (!ischild)
+	{
+		cerr << "fg: no current job" << endl;
+	}
+	
+	return;
+}
+
+void execbg(char **newargv, vector<string> paths)
+{
+	if (!ischild)
+	{
+		cerr << "bg: no current job" << endl;
+	}
+	return;
+}
+
 bool execcmds(const vector<string> &cmds, int pcount, vector<string> paths)
 {
 	int pcntbckup = pcount;
@@ -415,6 +434,36 @@ bool execcmds(const vector<string> &cmds, int pcount, vector<string> paths)
 			if (strcmp(newargv[0], (char*)"cd") == 0)
 			{
 				execcd(newargv, paths);
+				//clear all memory
+				if (newvec.size() > 0)
+				{
+					newvec.clear();
+					for (unsigned k=0; k <= newvec.size(); k++)
+					{
+							delete[] newargv[k];
+					}
+					delete[] newargv;
+				}
+			}
+
+			else if (strcmp(newargv[0], (char*)"fg") == 0)
+			{
+				execfg(newargv, paths);
+				//clear all memory
+				if (newvec.size() > 0)
+				{
+					newvec.clear();
+					for (unsigned k=0; k <= newvec.size(); k++)
+					{
+							delete[] newargv[k];
+					}
+					delete[] newargv;
+				}
+			}
+
+			else if (strcmp(newargv[0], (char*)"bg") == 0)
+			{
+				execbg(newargv, paths);
 				//clear all memory
 				if (newvec.size() > 0)
 				{
