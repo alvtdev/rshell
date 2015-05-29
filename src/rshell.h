@@ -23,6 +23,7 @@ using namespace std;
 bool signalfound = false;
 struct sigaction currstate;
 struct sigaction prevstate;
+bool ischild = false;
 
 void printprompt()
 {
@@ -58,9 +59,7 @@ void printprompt()
 	printf("\033[36m");
 	printf(" %s", "$ ");
 	printf("\033[0m");
-}
-
-void getinput(string &rawinput)
+} void getinput(string &rawinput)
 {
 	if(cin.fail())
 	{
@@ -436,6 +435,7 @@ bool execcmds(const vector<string> &cmds, int pcount, vector<string> paths)
 				//if we're in the child
 				if (pid == 0)
 				{	
+					ischild = true;
 					//handle piping
 					if (pcntbckup - pcount == 0 && cmds.at(i) == "|")
 					{
@@ -518,7 +518,6 @@ bool execcmds(const vector<string> &cmds, int pcount, vector<string> paths)
 						}
 					}
 
-
 					//execute
 					else 
 					{
@@ -538,13 +537,21 @@ bool execcmds(const vector<string> &cmds, int pcount, vector<string> paths)
 					}
 
 				}
-				else
+				else if (pid > 0)
 				{
-					if (-1 == wait(0)) 
+					int wpid = 0;
+					do
+					{
+						wpid = wait(0);
+					}
+					while (wpid == -1 && errno == EINTR);
+					if (wpid == -1)
 					{
 						perror("wait failed");
 						exit(1);
 					}
+					ischild = false;
+					if (errno != 0) errno = 0;
 					pcntbckup--;
 					//if not the last pipe, only close write end
 					if (pcntbckup >= 0)
@@ -654,19 +661,6 @@ bool execcmds(const vector<string> &cmds, int pcount, vector<string> paths)
 			newvec.push_back(cmds.at(i));
 		}
 	}
-	return false;
-}
-
-bool findcd(vector<string> cmds)
-{
-	for (unsigned i=0; i < cmds.size(); i++)
-	{
-		if (cmds.at(i) == "cd")
-		{
-			return true;
-		} 
-	}
-
 	return false;
 }
 

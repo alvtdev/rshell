@@ -69,10 +69,6 @@ int main (int argc, char** argv)
 			}
 			*/
 			int pcount = pipecount(parsedinput);		
-//			bool cdfound = findcd(cmds);
-//			cout << "cdfound = " << cdfound << endl;
-			//bool cdfound = cdcheck(cmds);
-			//cout << "pcount = " << pcount << endl;
 			if (synerror != true)	synerror = execcmds(cmds, pcount, paths);
 			if (synerror == true)	printf("Syntax error.\n");
 		}
