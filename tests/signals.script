@@ -1,0 +1,106 @@
+Script started on Fri 29 May 2015 09:45:30 PM PDT
+~/rshell
+athai005@hammer $ bin/rshell
+Welcome to Rshell!
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0mpwd
+/home/csmajs/athai005/rshell
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0m#test cd by itself
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0mcd
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mpwd
+/home/csmajs/athai005
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m#home directory b printed as ! ~
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m#test cd <path>
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mdc  cd Desktop
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/Desktop[0m[36m $ [0mcd cs061/assn
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/Desktop/cs061/assn[0m[36m $ [0mcd ../../../
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcd rshell/src
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell/src[0m[36m $ [0mpwd
+/home/csmajs/athai005/rshell/src
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell/src[0m[36m $ [0mcd ../../
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m#test cd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell/src[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell/src[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m#p oldpwd still pre  reserved if invalid direc     papt  th is entered
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcd askmanjckm
+cd: No such file or directory
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell/src[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell/src[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m#testing signals. -SIGINT
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m^C
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m^C
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m^C
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m^C
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m#SIGINT doesn't exit e rshell
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m^C
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m^C
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m#testing SIGINT ON    on cat
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcat
+hello
+hello
+test
+test
+testtest
+testtest
+^C
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mps
+  PID TTY          TIME CMD
+21221 pts/43   00:00:00 bash
+21236 pts/43   00:00:00 rshell
+23448 pts/43   00:00:00 ps
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0m#testing SIGINT in an infinite loop program p made before this script
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcd rshell
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0mcat test.cpp
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	while (true);
+	return 0; 
+} 
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0m./test.o
+^C
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0mps
+  PID TTY          TIME CMD
+21221 pts/43   00:00:00 bash
+21236 pts/43   00:00:00 rshell
+23594 pts/43   00:00:00 ps
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0mls
+bin  cat  LICENSE  Makefile  Makefile~	README.md  README.md~  src  test.cpp  test.o  tests
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0m#test SIGINT in another instance of rshell
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0mbin/rshell
+Welcome to Rshell!
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0m^C
+
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0m^C
+
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0m^C
+
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0m^C
+
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0m^C
+
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0m#does not exit.  
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0m#test cd in second rshell
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0mcd
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcd Desktop/cs061/assn
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/Desktop/cs061/assn[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/Desktop/cs061/assn[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcd asdfasdfasdf
+cd: No such file or directory
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/Desktop/cs061/assn[0m[36m $ [0mcd -
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mcd
+[32mathai005@hammer.cs.ucr.edu [0m[33m~[0m[36m $ [0mexit
+Goodbye.
+[32mathai005@hammer.cs.ucr.edu [0m[33m~/rshell[0m[36m $ [0mexit
+Goodbye.
+~/rshell
+athai005@hammer $ exit
+
+Script done on Fri 29 May 2015 09:49:46 PM PDT

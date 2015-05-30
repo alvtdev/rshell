@@ -52,7 +52,7 @@ int main (int argc, char** argv)
 				exit(1);
 			}
 		}
-		printprompt();
+		printprompt(homedir);
 		string rawinput; 
 		getinput(rawinput);
 		if (signalfound == true) continue;

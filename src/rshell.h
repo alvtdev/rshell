@@ -25,7 +25,7 @@ struct sigaction currstate;
 struct sigaction prevstate;
 bool ischild = false;
 
-void printprompt()
+void printprompt(const char* homedir)
 {
 	//obtain login and hostname
 	char* login = getlogin();
@@ -52,14 +52,27 @@ void printprompt()
 
 	//print yellow for current directory
 	printf("\033[33m");
-	printf(currdir);
+	if(strcmp(homedir, currdir) <= 0)
+	{
+		printf("~");
+		for (unsigned i=strlen(homedir); currdir[i]!='\0'; i++)
+		{
+			cout << currdir[i];
+		}
+	}
+	else
+	{
+		printf(currdir);
+	}
 	printf("\033[0m");
 
 	//simple command prompt print
 	printf("\033[36m");
 	printf(" %s", "$ ");
 	printf("\033[0m");
-} void getinput(string &rawinput)
+} 
+
+void getinput(string &rawinput)
 {
 	if(cin.fail())
 	{
@@ -282,17 +295,17 @@ void execcd(char **newargv, vector<string> paths)
 	}
 	if (newargv[1] == NULL)
 	{
-		if (-1 == setenv("OLDPWD", currdir, 1))
-		{
-			perror("set OLDPWD after cd failed");
-			exit(1);
-		}
 		if (-1 == chdir(getenv("HOME")))
 		{
 			perror("chdir to home failed");
 			exit(1);
 		}
-		if (-1 == setenv("PWD", newargv[1], 1))
+		if (-1 == setenv("OLDPWD", currdir, 1))
+		{
+			perror("set OLDPWD after cd failed");
+			exit(1);
+		}
+		if (-1 == setenv("PWD", getenv("HOME"), 1))
 		{
 			perror("set PWD after cd failed");
 			exit(1);
@@ -301,14 +314,15 @@ void execcd(char **newargv, vector<string> paths)
 	else if (strcmp(newargv[1], "-") == 0)
 	{
 		string prevpath = getenv("OLDPWD");
+		if (-1 == chdir(prevpath.c_str())) 
+		{
+			perror("chdir to previous failed");
+			return;
+		}
 		if (-1 == setenv("OLDPWD", currdir, 1))
 		{
 			perror("set OLDPWD after cd failed");
 			exit(1);
-		}
-		if (-1 == chdir(prevpath.c_str())) 
-		{
-			perror("chdir to previous failed");
 		}
 		if (-1 == setenv("PWD", newargv[1], 1))
 		{
@@ -319,14 +333,15 @@ void execcd(char **newargv, vector<string> paths)
 	else
 	{
 		//newargv[0] wil be "cd", just ignore it.
+		if (-1 == chdir(newargv[1]))
+		{
+			perror("cd");
+			return;
+		}
 		if (-1 == setenv("OLDPWD", currdir, 1))
 		{
 			perror("set OLDPWD after cd failed");
 			exit(1);
-		}
-		if (-1 == chdir(newargv[1]))
-		{
-			perror("chdir failed");
 		}
 		if (-1 == setenv("PWD", newargv[1], 1))
 		{
