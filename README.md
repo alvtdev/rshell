@@ -13,6 +13,9 @@ It is essentially an unfinished, more limited version of Bash.
 * prints a "Goodbye" message when terminated.
 * ^C does not terminate Rshell.
 * ^Z does not background Rshell.
+* `cd <path>` changes the current directory to <path>
+* `cd -` changes the current directory to the previous directory
+* `cd` without any parameters changes the current directory to the home directory
 * A syntax error message will be printed when one is detected. (e.g. ls &&&&&&& ; ||||)
 * i/o redirection symbols and piping symbols entered as the first or last character of the input will be treated as syntax errors.
 * somewhat supports piping (see bugs)
